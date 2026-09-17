@@ -1,0 +1,358 @@
+---
+import { Picture, getImage } from 'astro:assets';
+import { eventos as textosEventos } from '../data/textos';
+import { eventosPublicados } from '../data/conteudo';
+import RotuloSecao from './RotuloSecao.astro';
+
+interface Props { numero?: string }
+const { numero } = Astro.props;
+
+/**
+ * Registros de participação. As legendas são neutras de propósito:
+ * nada aqui afirma organização de evento, autoria de campanha ou vínculo com marcas
+ * visíveis nas fotos. Papel específico ainda não informado pelo kit.
+ */
+const grupos = await Promise.all(
+  eventosPublicados.map(async (evento) => ({
+    ...evento,
+    imagens: await Promise.all(
+      evento.imagens.map(async (imagem) => {
+        const ampliada = await getImage({
+          src: imagem.src,
+          width: Math.min(imagem.src.width, 1400),
+          format: 'webp',
+          quality: 'high',
+        });
+        return {
+          ...imagem,
+          paisagem: imagem.src.width > imagem.src.height,
+          ampliada: {
+            src: ampliada.src,
+            largura: ampliada.options.width ?? imagem.src.width,
+            altura: ampliada.attributes?.height ?? undefined,
+          },
+        };
+      }),
+    ),
+  })),
+);
+---
+
+<section class="secao secao-registros" id="registros" aria-labelledby="titulo-registros">
+  <div class="container">
+    <RotuloSecao numero={numero} texto="Registros" />
+
+    <div class="registros__abertura">
+      <h2 id="titulo-registros">{textosEventos.titulo}</h2>
+      <p class="registros__intro">{textosEventos.intro}</p>
+    </div>
+
+    {grupos.map((grupo) => (
+      <article class="registros__grupo" aria-labelledby={`grupo-${grupo.slug}`}>
+        <header class="registros__cabecalho">
+          <h3 id={`grupo-${grupo.slug}`} class="registros__titulo">{grupo.title}</h3>
+          <p class="registros__tipo">{grupo.kind}</p>
+        </header>
+
+        <ul class="registros__grade">
+          {grupo.imagens.map((imagem) => (
+            <li class="registros__item" data-paisagem={String(imagem.paisagem)}>
+              <figure class="registros__figura">
+                <div class="registros__moldura">
+                  <Picture
+                    src={imagem.src}
+                    alt={imagem.alt}
+                    widths={[400, 800, 1200]}
+                    sizes="(min-width: 75em) 32rem, (min-width: 48em) 45vw, 90vw"
+                    loading="lazy"
+                    decoding="async"
+                    formats={['avif', 'webp']}
+                    class="registros__imagem"
+                  />
+                  <button
+                    type="button"
+                    class="registros__ampliar"
+                    data-ampliada={imagem.ampliada.src}
+                    data-alt={imagem.alt}
+                    data-legenda={imagem.legenda ?? ''}
+                    hidden
+                  >
+                    <span class="visualmente-oculto">Ampliar imagem: {imagem.alt}</span>
+                    <span class="registros__lupa" aria-hidden="true">+</span>
+                  </button>
+                </div>
+                {imagem.legenda && (
+                  <figcaption class="registros__legenda">
+                    {imagem.legenda}
+                    {imagem.credito && <span class="registros__credito"> Foto: {imagem.credito}.</span>}
+                  </figcaption>
+                )}
+              </figure>
+            </li>
+          ))}
+        </ul>
+      </article>
+    ))}
+  </div>
+</section>
+
+<!-- Ampliação: <dialog> nativo dá Escape, foco retido e fundo inerte sem biblioteca. -->
+<dialog class="visor" aria-label="Imagem ampliada">
+  <div class="visor__conteudo">
+    <button type="button" class="visor__fechar" autofocus>
+      <span class="visualmente-oculto">Fechar imagem ampliada</span>
+      <span aria-hidden="true">×</span>
+    </button>
+    <img class="visor__imagem" alt="" />
+    <p class="visor__legenda"></p>
+  </div>
+</dialog>
+
+<script>
+  const visor = document.querySelector<HTMLDialogElement>('.visor');
+  const visorImagem = visor?.querySelector<HTMLImageElement>('.visor__imagem');
+  const visorLegenda = visor?.querySelector<HTMLParagraphElement>('.visor__legenda');
+  const fechar = visor?.querySelector<HTMLButtonElement>('.visor__fechar');
+  const gatilhos = document.querySelectorAll<HTMLButtonElement>('.registros__ampliar');
+
+  // Só habilita a ampliação onde o <dialog> modal existe de fato.
+  if (visor && visorImagem && visorLegenda && fechar && typeof visor.showModal === 'function') {
+    let ultimoGatilho: HTMLButtonElement | null = null;
+
+    /**
+     * Limpeza após fechar. É idempotente de propósito: roda por vários caminhos
+     * (botão, clique no fundo, Escape e o evento `close`), porque nem todo
+     * navegador dispara `close` de forma confiável, e o foco precisa voltar
+     * ao gatilho em todos eles.
+     */
+    const finalizar = () => {
+      visorImagem.removeAttribute('src');
+      visorLegenda.textContent = '';
+      visorLegenda.hidden = true;
+      const alvo = ultimoGatilho;
+      ultimoGatilho = null;
+      alvo?.focus();
+    };
+
+    const fecharVisor = () => {
+      visor.close();
+      finalizar();
+    };
+
+    for (const gatilho of gatilhos) {
+      gatilho.hidden = false;
+      gatilho.addEventListener('click', () => {
+        ultimoGatilho = gatilho;
+        visorImagem.src = gatilho.dataset.ampliada ?? '';
+        visorImagem.alt = gatilho.dataset.alt ?? '';
+        const legenda = gatilho.dataset.legenda ?? '';
+        visorLegenda.textContent = legenda;
+        visorLegenda.hidden = legenda === '';
+        visor.showModal();
+      });
+    }
+
+    fechar.addEventListener('click', fecharVisor);
+
+    // Clique fora da imagem fecha, sem capturar cliques na própria figura.
+    visor.addEventListener('click', (evento) => {
+      if (evento.target === visor) fecharVisor();
+    });
+
+    /**
+     * Escape. O <dialog> modal já trata a tecla nativamente na maioria dos
+     * navegadores, mas nem todos disparam `cancel`/`close` de forma confiável —
+     * então fechamos explicitamente e cancelamos o tratamento nativo para não
+     * fechar duas vezes. Assim a tecla funciona em qualquer caso.
+     */
+    visor.addEventListener('keydown', (evento) => {
+      if (evento.key === 'Escape') {
+        evento.preventDefault();
+        fecharVisor();
+      }
+    });
+
+    visor.addEventListener('cancel', (evento) => {
+      evento.preventDefault();
+      fecharVisor();
+    });
+
+    visor.addEventListener('close', finalizar);
+  }
+</script>
+
+<style>
+  .secao-registros { background-color: color-mix(in srgb, var(--color-sand) 14%, var(--color-cream)); }
+
+  .registros__abertura {
+    display: grid;
+    gap: var(--space-2);
+    margin-block: var(--space-3) clamp(2rem, 4vw, 3rem);
+  }
+  .registros__abertura h2 { max-width: 20ch; }
+  .registros__intro {
+    max-width: var(--measure);
+    font-size: var(--step-lead);
+    color: var(--color-olive);
+  }
+
+  .registros__grupo + .registros__grupo { margin-block-start: clamp(2.5rem, 5vw, 4rem); }
+
+  .registros__cabecalho {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-1) var(--space-3);
+    padding-block-end: var(--space-2);
+    margin-block-end: var(--space-3);
+    border-block-end: 1px solid var(--rule);
+  }
+
+  .registros__titulo { font-size: var(--step-h3); }
+
+  .registros__tipo {
+    font-family: var(--font-display);
+    font-size: var(--step-label);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-olive);
+  }
+
+  .registros__grade {
+    display: grid;
+    gap: clamp(1rem, 2.5vw, 1.75rem);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    grid-template-columns: 1fr;
+  }
+
+  .registros__figura { margin: 0; }
+
+  .registros__moldura {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--radius);
+    background-color: color-mix(in srgb, var(--color-olive) 12%, var(--color-cream));
+  }
+
+  .registros__moldura :global(picture) { display: block; }
+
+  .registros__imagem {
+    width: 100%;
+    height: auto;
+    /* Sem filtro: cor e textura das peças permanecem como no original. */
+    transition: scale var(--duration) var(--ease);
+  }
+  .registros__moldura:hover .registros__imagem { scale: 1.015; }
+
+  .registros__ampliar {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: end start;
+    padding: var(--space-2);
+    background: transparent;
+    border: 0;
+    cursor: zoom-in;
+  }
+
+  .registros__lupa {
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    font-size: 1.5rem;
+    line-height: 1;
+    color: var(--color-forest);
+    background-color: var(--color-cream);
+    border-radius: 999px;
+    opacity: 0;
+    transition: opacity var(--duration) var(--ease);
+  }
+  .registros__ampliar:hover .registros__lupa,
+  .registros__ampliar:focus-visible .registros__lupa { opacity: 1; }
+  /* Em telas de toque não há hover: o botão fica sempre visível. */
+  @media (hover: none) {
+    .registros__lupa { opacity: 1; }
+  }
+
+  .registros__legenda {
+    margin-block-start: 0.75rem;
+    font-size: var(--step-small);
+    line-height: 1.5;
+    color: var(--color-olive);
+    max-width: 46ch;
+  }
+  .registros__credito { color: var(--color-olive); }
+
+  @media (min-width: 48em) {
+    /* Duas colunas com alturas naturais: retratos e paisagens convivem sem recorte,
+       e a diferença de altura é justamente a assimetria que a direção de arte pede. */
+    .registros__grade {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: start;
+    }
+  }
+
+  @media (min-width: 62em) {
+    /* Pequeno desalinhamento editorial na coluna da direita. */
+    .registros__item:nth-child(even) { margin-block-start: clamp(1.5rem, 4vw, 3rem); }
+    /* Grupo com uma única imagem não estica pela largura toda. */
+    .registros__grade:not(:has(> :nth-child(2))) .registros__figura { max-width: 26rem; }
+  }
+
+  /* ---- Visor ---- */
+  .visor {
+    width: min(92vw, 62rem);
+    max-width: none;
+    max-height: 92dvh;
+    padding: 0;
+    color: var(--color-cream);
+    background-color: var(--color-forest);
+    border: 0;
+    border-radius: var(--radius);
+  }
+  .visor::backdrop { background-color: rgb(40 54 24 / 0.82); }
+
+  .visor__conteudo {
+    position: relative;
+    display: grid;
+    gap: var(--space-2);
+    padding: var(--space-2);
+  }
+
+  .visor__imagem {
+    width: 100%;
+    max-height: 76dvh;
+    object-fit: contain;
+    border-radius: var(--radius-sm);
+  }
+
+  .visor__legenda {
+    font-size: var(--step-small);
+    color: var(--color-sand);
+    text-align: center;
+  }
+  .visor__legenda:empty { display: none; }
+
+  .visor__fechar {
+    position: absolute;
+    top: calc(var(--space-2) + 0.25rem);
+    right: calc(var(--space-2) + 0.25rem);
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    font-size: 1.75rem;
+    line-height: 1;
+    color: var(--color-forest);
+    background-color: var(--color-cream);
+    border: 0;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+  .visor__fechar:focus-visible { outline: 3px solid var(--color-sand); outline-offset: 3px; }
+</style>

@@ -1,0 +1,32 @@
+[
+  {
+    "slug": "influent-summit",
+    "title": "Influent Summit 2026",
+    "kind": "Participação em evento",
+    "year": 2026,
+    "date": null,
+    "description": "Registro de participação em evento, conforme informado pelo usuário. Ano legível no crachá.",
+    "assetIds": [
+      "evento-1782411664005"
+    ],
+    "privateAssetIds": [
+      "evento-q123"
+    ],
+    "status": "pronto-para-galeria"
+  },
+  {
+    "slug": "projeto-scwepss",
+    "title": "Registros de apresentação e produto",
+    "sourceFolder": "Projeto Scwepss",
+    "kind": "Registro de participação",
+    "date": null,
+    "description": "Imagens de apresentação e composição de produto com identidade Schweppes, enviadas como registros de participação. Natureza acadêmica ou comercial e papel específico ainda não informados.",
+    "assetIds": [
+      "evento-1781136192015",
+      "evento-1781136196282",
+      "evento-1781136196790",
+      "evento-1781136198300"
+    ],
+    "status": "pronto-para-galeria-com-legenda-neutra"
+  }
+]

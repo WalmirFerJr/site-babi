@@ -1,0 +1,149 @@
+{
+  "name": "Bárbara Fraquete",
+  "fullName": "Bárbara Fraquete de Andrade",
+  "headline": "Social Media Content Creator | Estratégia de conteúdo e influência",
+  "summary": "Social Media Content Creator na HAOMA e estudante de Publicidade e Propaganda. Experiência em calendários editoriais, comunicação de lançamentos, campanhas sazonais, copywriting, produção audiovisual e relacionamento com creators. Na Digipix, gestão de mais de 50 influenciadores e contribuição para campanhas com mais de 1.000 conteúdos e para um perfil que superou 1 milhão de seguidores.",
+  "email": "babifraquete@gmail.com",
+  "location": null,
+  "linkedin": null,
+  "instagram": null,
+  "education": {
+    "institution": "Universidade Anhembi Morumbi",
+    "degree": "Bacharelado em Publicidade e Propaganda",
+    "start": "2024-01",
+    "expectedEnd": "2027-12",
+    "status": "Em andamento"
+  },
+  "experiences": [
+    {
+      "company": "HAOMA",
+      "role": "Social Media Content Creator",
+      "start": "2026-07",
+      "end": null,
+      "current": true,
+      "period": "Jul. 2026 - atual",
+      "bullets": [
+        "Planejo e produzo conteúdo digital, desenvolvendo conceitos, copywriting, roteiros e briefings criativos e acompanhando produções audiovisuais do briefing à aprovação.",
+        "Desenvolvo e gerencio o calendário editorial para pautas institucionais, comerciais, editoriais e de produto, conectando lançamentos, campanhas e datas sazonais ao posicionamento de marca e à estratégia de social media.",
+        "Executo ações de marketing de influência, gestão de creators e community management, alinhando briefings e entregas e monitorando tendências, alcance, retenção, engajamento e comportamento da comunidade para gerar relatórios, insights e otimizações de conteúdo."
+      ],
+      "keywords": [
+        "Conteúdo",
+        "Campanhas",
+        "Creators",
+        "Performance"
+      ]
+    },
+    {
+      "company": "Digipix",
+      "role": "Assistente de Marketing",
+      "start": "2025-07",
+      "end": "2026-07",
+      "period": "Jul. 2025 - jul. 2026",
+      "bullets": [
+        "Gerenciei o relacionamento com mais de 50 influenciadores, realizando alinhamento de briefings, acompanhamento de entregas e suporte a conteúdos de campanhas de marketing de influência.",
+        "Planejei, produzi e publiquei conteúdos para Instagram, TikTok, Facebook e LinkedIn, contribuindo para a estratégia de conteúdo e o posicionamento de um perfil da marca que ultrapassou 1 milhão de seguidores.",
+        "Participei do planejamento de campanhas digitais de grande escala, como Black Friday, com mais de 1.000 conteúdos produzidos, desenvolvendo calendários editoriais e roteiros com copywriting e storytelling.",
+        "Analisei métricas e interações da comunidade para orientar ajustes no conteúdo e nas campanhas."
+      ],
+      "current": false,
+      "keywords": [
+        "Social Media",
+        "Influência",
+        "Conteúdo",
+        "Métricas"
+      ]
+    },
+    {
+      "company": "Digipix",
+      "role": "Estagiária de Marketing",
+      "start": "2024-06",
+      "end": "2025-07",
+      "period": "Jun. 2024 - jul. 2025",
+      "bullets": [
+        "Desenvolvi conteúdos para redes sociais, blog e e-mail marketing com Canva e Photoshop, aplicando técnicas de CTR e retenção para otimizar o engajamento.",
+        "Apoiei a prospecção de influenciadores, a gestão de comunidade e o acompanhamento de métricas de performance para gerar aprendizados e ajustes nas campanhas."
+      ],
+      "keywords": [
+        "Marketing de Conteúdo",
+        "Influência",
+        "Social Media"
+      ]
+    },
+    {
+      "company": "Sorella Store",
+      "role": "Assistente de E-commerce",
+      "start": "2022-03",
+      "end": "2024-04",
+      "period": "Mar. 2022 - abr. 2024",
+      "bullets": [
+        "Planejei campanhas de marketing digital e cronogramas, criando conteúdos e copys de produtos para Instagram, TikTok e Facebook e realizando gestão de redes sociais e relacionamento com o público.",
+        "Acompanhei metas, KPIs e desempenho de conteúdo e desenvolvi relatórios e dashboards para apoiar decisões de e-commerce, campanhas e otimização de resultados."
+      ],
+      "keywords": [
+        "Marketing Digital",
+        "Copywriting",
+        "KPIs"
+      ]
+    }
+  ],
+  "skills": [
+    "Estratégia e calendário de conteúdo",
+    "Gestão de redes sociais",
+    "Comunicação de lançamentos",
+    "Campanhas sazonais",
+    "Copywriting e storytelling",
+    "Roteiros e direcionamento criativo",
+    "Produção audiovisual e briefings",
+    "Marketing de influência e gestão de creators",
+    "Community management",
+    "Posicionamento de marca",
+    "Análise de performance e KPIs",
+    "SEO"
+  ],
+  "tools": [
+    "Canva",
+    "Photoshop",
+    "Pacote Adobe",
+    "Pacote Office",
+    "mLabs",
+    "Plataformas de agendamento"
+  ],
+  "languages": [
+    {
+      "language": "Português",
+      "level": "Nativo"
+    },
+    {
+      "language": "Inglês",
+      "level": "Avançado"
+    }
+  ],
+  "selectedCourses": [
+    {
+      "name": "Social Media Pro",
+      "institution": "mLabs",
+      "year": "2026"
+    },
+    {
+      "name": "Curso Intensivo de SEO",
+      "institution": "Semrush",
+      "year": "2025"
+    },
+    {
+      "name": "Princípios de Marketing Analytics para gerar insights",
+      "institution": "FGV",
+      "year": "2025"
+    },
+    {
+      "name": "Marketing Digital e Influência",
+      "institution": "Senac",
+      "year": "2025"
+    },
+    {
+      "name": "Branding: Criação e gestão de marcas",
+      "institution": "Udemy",
+      "year": "2024"
+    }
+  ]
+}

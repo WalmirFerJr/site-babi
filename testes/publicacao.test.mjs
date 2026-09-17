@@ -41,12 +41,16 @@ test('imagem com publicUse falso nunca é publicada', async () => {
   assert.ok(privadas.length > 0, 'o manifesto precisa ter ao menos uma imagem privada para este teste valer');
 
   for (const asset of privadas) {
-    // O arquivo não pode ter entrado no projeto, sob nenhum nome.
-    const noProjeto = (await arquivos(path.join(siteDir, 'src/assets'))).filter((f) =>
-      path.basename(f).startsWith(asset.id),
+    // Comparação exata: um derivado publicável ("evento-q123-sem-qr") tem o id do
+    // original como prefixo, e um "startsWith" o acusaria por engano.
+    const semExtensao = (f) => path.basename(f).replace(/\.[^.]+$/, '');
+    const noProjeto = (await arquivos(path.join(siteDir, 'src/assets'))).filter(
+      (f) => semExtensao(f) === asset.id,
     );
     assert.deepEqual(noProjeto, [], `${asset.id} não deveria estar em src/assets/`);
-    assert.ok(!htmlJunto.includes(asset.id), `${asset.id} é referenciado no HTML publicado`);
+
+    const referencia = new RegExp(`${asset.id}(?![\\w-])`);
+    assert.ok(!referencia.test(htmlJunto), `${asset.id} é referenciado no HTML publicado`);
 
     // Com o kit por perto, a verificação é mais forte: comparação byte a byte,
     // que pega o arquivo mesmo renomeado ou reprocessado. Sem o kit (clone só do

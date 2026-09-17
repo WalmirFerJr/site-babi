@@ -23,6 +23,7 @@ const kitDir = path.resolve(siteDir, '..');
 
 const DATA_DIR = path.join(siteDir, 'src/data');
 const EVENT_IMG_DIR = path.join(siteDir, 'src/assets/eventos');
+const FOTO_DIR = path.join(siteDir, 'src/assets/fotos');
 const DECOR_DIR = path.join(siteDir, 'src/assets/decoracao');
 const PDF_DIR = path.join(siteDir, 'public/curriculo');
 
@@ -97,6 +98,7 @@ async function main() {
 
   await mkdir(DATA_DIR, { recursive: true });
   await mkdir(EVENT_IMG_DIR, { recursive: true });
+  await mkdir(FOTO_DIR, { recursive: true });
   await mkdir(DECOR_DIR, { recursive: true });
   await mkdir(PDF_DIR, { recursive: true });
 
@@ -113,12 +115,14 @@ async function main() {
 
   // Só imagens de evento liberadas entram no projeto. O nome do arquivo passa a ser
   // o id do manifesto, o que evita espaços/acentos no caminho e mantém a rastreabilidade.
-  await limparDiretorio(EVENT_IMG_DIR, ['.jpeg', '.jpg', '.png', '.webp', '.avif']);
+  const extensoes = ['.jpeg', '.jpg', '.png', '.webp', '.avif'];
+  await limparDiretorio(EVENT_IMG_DIR, extensoes);
+  await limparDiretorio(FOTO_DIR, extensoes);
 
   let copiadas = 0;
   let bloqueadas = 0;
   for (const asset of manifesto.assets ?? []) {
-    if (asset.type !== 'event-photo' && asset.type !== 'case-image' && asset.type !== 'portrait') continue;
+    if (!['event-photo', 'case-image', 'portrait'].includes(asset.type)) continue;
     if (asset.publicUse !== true) {
       bloqueadas++;
       warn.push(`bloqueado (publicUse !== true): ${asset.path}`);
@@ -129,8 +133,8 @@ async function main() {
       warn.push(`arquivo ausente no kit: ${asset.path}`);
       continue;
     }
-    const destino = path.join(EVENT_IMG_DIR, `${asset.id}${path.extname(asset.path).toLowerCase()}`);
-    await copyFile(origem, destino);
+    const pasta = asset.type === 'portrait' ? FOTO_DIR : EVENT_IMG_DIR;
+    await copyFile(origem, path.join(pasta, `${asset.id}${path.extname(asset.path).toLowerCase()}`));
     copiadas++;
   }
   log.push(`${copiadas} imagem(ns) liberada(s) → src/assets/eventos/ (${bloqueadas} bloqueada(s) por publicUse)`);

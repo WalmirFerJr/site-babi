@@ -84,6 +84,9 @@ export interface Evento {
   kind: string;
   year?: number;
   date: string | null;
+  /** Data por extenso, só quando conhecida. Nunca inferida de nome de arquivo. */
+  dateLabel?: string;
+  location?: string;
   description: string;
   assetIds: string[];
   privateAssetIds?: string[];

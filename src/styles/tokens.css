@@ -1,0 +1,79 @@
+/*
+ * Base: design/tokens.css do kit. Os cinco hex não mudam.
+ * O que foi acrescentado: escala tipográfica fluida, gutters por breakpoint
+ * e papéis de cor já validados por contraste.
+ *
+ * Contrastes (luminância relativa sRGB, calculados no kit):
+ *   floresta/creme  12.24:1  texto normal AA
+ *   creme/floresta  12.24:1  texto normal AA
+ *   oliva/creme      5.40:1  texto normal AA
+ *   creme/oliva      5.40:1  texto normal AA
+ *   areia/floresta   5.72:1  texto normal AA
+ *   floresta/areia   5.72:1  texto normal AA
+ *   terracota/creme  3.76:1  SÓ texto grande (>=24px, ou >=18.7px bold) ou decoração
+ *   floresta/terracota 3.26:1 SÓ texto grande ou decoração
+ * Nunca usar texto pequeno creme sobre terracota.
+ */
+:root {
+  --color-terracotta: #bc6c25;
+  --color-sand: #dda15e;
+  --color-cream: #fefae0;
+  --color-forest: #283618;
+  --color-olive: #606c38;
+
+  --surface: var(--color-cream);
+  --text: var(--color-forest);
+  --text-muted: var(--color-olive);
+  --action-bg: var(--color-forest);
+  --action-text: var(--color-cream);
+
+  /* Papéis sobre fundo floresta: oliva não atinge AA sobre floresta (2,27:1). */
+  --on-forest-text: var(--color-cream);
+  --on-forest-muted: var(--color-sand);
+
+  --rule: color-mix(in srgb, var(--color-olive) 34%, transparent);
+  --rule-strong: var(--color-terracotta);
+
+  /* --fonte-corpo e --fonte-titulo vêm do <Font> do Astro (fontes auto-hospedadas,
+     ver astro.config.mjs). O fallback cobre o caso de as fontes não carregarem. */
+  --font-body: var(--fonte-corpo, ui-sans-serif, system-ui, 'Segoe UI', sans-serif);
+  --font-display: var(--fonte-titulo, ui-sans-serif, system-ui, 'Segoe UI', sans-serif);
+
+  --container: 75rem; /* 1200px */
+  --gutter: 1.25rem;  /* 20px no celular */
+
+  --space-1: 0.5rem;
+  --space-2: 1rem;
+  --space-3: 1.5rem;
+  --space-4: 2rem;
+  --space-5: 4rem;
+  --space-6: 7rem;
+
+  /* Escala fluida: H1 48→96px, H2 32→56px, corpo 16→18px. */
+  /* Máximo calibrado à largura real da coluna do hero (~60% do container):
+     acima disso a headline quebra com órfãs. Mínimo 48px, como na direção de arte. */
+  --step-hero: clamp(3rem, 1.75rem + 4.4vw, 4.75rem);
+  --step-h2: clamp(2rem, 1.3rem + 3vw, 3.5rem);
+  --step-h3: clamp(1.375rem, 1.15rem + 1vw, 1.75rem);
+  --step-lead: clamp(1.0625rem, 0.98rem + 0.4vw, 1.25rem);
+  --step-body: clamp(1rem, 0.96rem + 0.18vw, 1.125rem);
+  --step-small: 0.875rem;
+  --step-label: 0.8125rem;
+
+  --measure: 65ch;
+  --radius: 0.5rem;
+  --radius-sm: 0.25rem;
+  --duration: 200ms;
+  --ease: cubic-bezier(0.2, 0.6, 0.3, 1);
+}
+
+@media (min-width: 48em) {
+  :root { --gutter: 2rem; } /* 32px no tablet */
+}
+@media (min-width: 75em) {
+  :root { --gutter: 4rem; } /* 64px no desktop */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --duration: 0ms; }
+}

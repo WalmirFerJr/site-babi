@@ -60,14 +60,14 @@
 
   /* Foco sempre visível; a cor nunca é o único indicador (há contorno e deslocamento). */
   :focus-visible {
-    outline: 3px solid var(--color-olive);
+    outline: 3px solid var(--focus-ring);
     outline-offset: 3px;
     border-radius: var(--radius-sm);
   }
   .on-forest :focus-visible,
   .secao-contato :focus-visible,
   .rodape :focus-visible {
-    outline-color: var(--color-cream);
+    outline-color: var(--focus-ring-invert);
   }
 
   ::selection {
@@ -113,8 +113,8 @@
     left: var(--space-2);
     z-index: 100;
     padding: 0.75rem 1.25rem;
-    background-color: var(--color-forest);
-    color: var(--color-cream);
+    background-color: var(--action-bg);
+    color: var(--action-text);
     font-weight: 600;
     text-decoration: none;
     border-radius: var(--radius);
@@ -135,11 +135,11 @@
     font-weight: 700;
     letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: var(--color-olive);
+    color: var(--text-muted);
   }
   .rotulo-secao__numero {
     font-variant-numeric: tabular-nums;
-    color: var(--color-olive);
+    color: var(--text-muted);
   }
   .rotulo-secao::after {
     content: '';
@@ -149,10 +149,8 @@
     translate: 0 -0.2em;
   }
   .on-forest .rotulo-secao,
-  .on-forest .rotulo-secao__numero { color: var(--color-sand); }
-  .on-forest .rotulo-secao::after {
-    background-color: color-mix(in srgb, var(--color-sand) 45%, transparent);
-  }
+  .on-forest .rotulo-secao__numero { color: var(--on-invert-muted); }
+  .on-forest .rotulo-secao::after { background-color: var(--rule-invert); }
 
   /* ---- Botões ---- */
   .botao {
@@ -164,7 +162,7 @@
     font-weight: 600;
     font-size: var(--step-body);
     text-decoration: none;
-    border: 2px solid var(--color-forest);
+    border: 2px solid var(--action-border);
     border-radius: var(--radius);
     transition: background-color var(--duration) var(--ease),
                 color var(--duration) var(--ease),
@@ -177,20 +175,26 @@
     background-color: var(--action-bg);
     color: var(--action-text);
   }
-  .botao--principal:hover { background-color: var(--color-olive); border-color: var(--color-olive); }
+  .botao--principal:hover {
+    background-color: var(--action-hover-bg);
+    border-color: var(--action-hover-bg);
+  }
 
   .botao--secundario {
     background-color: transparent;
-    color: var(--color-forest);
+    color: var(--text);
   }
-  .botao--secundario:hover { background-color: var(--color-forest); color: var(--color-cream); }
+  .botao--secundario:hover { background-color: var(--action-bg); color: var(--action-text); }
 
   .on-forest .botao--principal {
     background-color: var(--color-cream);
     color: var(--color-forest);
     border-color: var(--color-cream);
   }
-  .on-forest .botao--principal:hover { background-color: var(--color-sand); border-color: var(--color-sand); }
+  .on-forest .botao--principal:hover {
+    background-color: var(--color-sand);
+    border-color: var(--color-sand);
+  }
 
   /* ---- Link com sublinhado animado ---- */
   .link {
@@ -198,7 +202,7 @@
     text-decoration: underline;
     text-decoration-thickness: 1px;
     text-underline-offset: 0.25em;
-    text-decoration-color: var(--color-terracotta);
+    text-decoration-color: var(--accent);
     transition: text-decoration-thickness var(--duration) var(--ease),
                 text-underline-offset var(--duration) var(--ease);
   }
@@ -206,13 +210,13 @@
     text-decoration-thickness: 2px;
     text-underline-offset: 0.3em;
   }
-  .on-forest .link { text-decoration-color: var(--color-sand); }
+  .on-forest .link { text-decoration-color: var(--on-invert-muted); }
 
   /* ---- Marca decorativa (asterisco) ---- */
   .marca-editorial {
     width: 1em;
     height: 1em;
     flex: none;
-    color: var(--color-terracotta);
+    color: var(--accent);
   }
 }

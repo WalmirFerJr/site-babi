@@ -1,0 +1,18 @@
+---
+/**
+ * Aplica o tema antes da primeira pintura, para não haver piscada de tema errado.
+ * Precisa ser síncrono e ficar no <head>, por isso não é um <script> do Astro
+ * (que sairia adiado no fim do body).
+ */
+---
+<script is:inline>
+  (function () {
+    try {
+      var salvo = localStorage.getItem('tema');
+      var escuro = salvo ? salvo === 'escuro' : matchMedia('(prefers-color-scheme: dark)').matches;
+      if (escuro) document.documentElement.dataset.tema = 'escuro';
+    } catch (e) {
+      /* Modo privado ou storage bloqueado: segue o tema claro. */
+    }
+  })();
+</script>

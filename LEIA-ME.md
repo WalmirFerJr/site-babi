@@ -51,8 +51,13 @@ social. Definir `SITE_URL` no painel da Vercel tem prioridade sobre o padrão do
 
 ### Textos da página
 
-`src/data/textos.ts` — títulos, chamadas, rótulos e os blocos de "Atuação". É um arquivo
-TypeScript comum: mudar uma frase ali muda a página, sem tocar em componente nenhum.
+`src/i18n/pt.ts` e `src/i18n/en.ts` — títulos, chamadas, rótulos e os blocos de "Atuação",
+um arquivo por idioma. São TypeScript comum, com a mesma forma (`src/i18n/tipos.ts`), então
+esquecer uma chave em um idioma vira erro de tipo, não texto faltando na página.
+
+`src/i18n/conteudo-en.ts` — tradução do que vem de `perfil.json` e `eventos.json`: cargos,
+períodos, atividades, competências, ferramentas e legendas. As chaves de experiência são
+`empresa|início`, estáveis mesmo que o cargo mude.
 
 ### Dados de carreira
 
@@ -92,6 +97,11 @@ alternativos e permissão de uso).
 
 Não são convenções de documentação: estão implementadas e cobertas por teste.
 
+0. **Dois idiomas, duas rotas.** `/` em português e `/en` em inglês, ambas estáticas.
+   A troca é um link, não JavaScript: cada versão é indexável, compartilhável por link e
+   funciona sem script. A tradução é fiel — nenhum número foi arredondado e nenhuma
+   atribuição foi reforçada na passagem ("contribuindo para a estratégia" virou
+   "contributing to the strategy", nunca "grew").
 1. **Imagem com `"publicUse": false` nunca sai do kit.** `scripts/sync-conteudo.mjs` se
    recusa a copiá-la, e `src/data/conteudo.ts` se recusa a exibi-la. Hoje isso protege
    `q123.jpeg`, o crachá com QR code do Influent Summit: ele não está em `src/`, não está
@@ -113,6 +123,23 @@ Não são convenções de documentação: estão implementadas e cobertas por te
    ou autoria em nenhum texto visível.
 7. **Contato por `mailto:`**, sem formulário — nada é simulado como "enviado".
 8. **Número simulado não entra.** Ver a seção seguinte.
+
+## Tema claro e escuro
+
+O botão no cabeçalho alterna os dois. O padrão é a preferência do sistema; a escolha
+explícita fica em `localStorage` e passa a valer a partir dali. Um script pequeno no
+`<head>` aplica o tema antes da primeira pintura, para não haver piscada de tema errado.
+
+Os dois temas usam **os mesmos cinco hex** — o que muda é o papel de cada cor, definido
+em `src/styles/tokens.css`. Nenhum componente usa cor fixa de fundo ou de texto: todos
+consomem papéis (`--surface`, `--text`, `--text-muted`, `--accent`, `--on-invert-*`).
+
+As misturas do tema escuro têm um teto medido, não escolhido por gosto: areia sobre uma
+superfície com 20% de oliva dá 4,87:1, com 24% dá 4,73:1 e com 34% cai para 4,37:1, que
+reprova. Por isso as superfícies elevadas param em 20%.
+
+Sem JavaScript o botão não aparece — não haveria como alternar nem lembrar a escolha —,
+mas o tema do sistema continua valendo.
 
 ---
 
@@ -170,13 +197,30 @@ no site pelo botão "Baixar currículo", passando por fora de todas as outras ve
 
 ### Retrato
 
-1. Coloque o arquivo em `assets/fotos/` no kit (mínimo 1600 px no lado maior).
-2. Registre no `manifest.json` usando o `entryTemplate`, com `"type": "portrait"`,
-   `"publicUse": true`, `alt` e crédito.
-3. `npm run sync:conteudo`.
-4. Em `src/components/Hero.astro`, troque o bloco `<svg class="hero__composicao">` por um
-   `<Picture>` apontando para a imagem. O comentário no arquivo marca o lugar exato.
-   O mesmo vale para o retrato secundário em `src/components/Sobre.astro`.
+O hero já sabe usar um retrato: se houver um asset `"type": "portrait"` com
+`"publicUse": true` no manifesto, ele entra no lugar da composição abstrata, sem tocar em
+componente nenhum. Para adicionar:
+
+1. Salve o arquivo em `assets/fotos/` no kit, de preferência com 1600 px ou mais no lado
+   maior — por exemplo `assets/fotos/barbara-retrato-01.jpg`.
+2. Acrescente a entrada em `assets/manifest.json`:
+
+   ```json
+   {
+     "id": "retrato-principal",
+     "path": "assets/fotos/barbara-retrato-01.jpg",
+     "type": "portrait",
+     "status": "received",
+     "alt": "Retrato de Bárbara Fraquete.",
+     "credit": null,
+     "width": 0,
+     "height": 0,
+     "publicUse": true
+   }
+   ```
+
+   `width` e `height` podem ficar em 0: quem mede a imagem é o build.
+3. `npm run sync:conteudo && npm run build`.
 
 ### Logos das empresas
 
@@ -210,11 +254,11 @@ repositório.
 
 | Falta | Para quê | Onde entra |
 | --- | --- | --- |
-| Retrato editorial | Área visual do hero e coluna do "Sobre" | `assets/fotos/` |
+| **Retrato editorial** | Área visual do hero. O suporte já está pronto: basta o arquivo e a entrada no manifesto | `assets/fotos/` |
 | Logos de HAOMA, Digipix e Sorella Store | Trajetória com marca, em vez de só texto | `assets/logos/` |
 | Peças de campanha com autoria identificada | Primeiro case publicável | `assets/cases/` |
 | Contexto do "Projeto Scwepss" | Nome oficial, data, natureza e papel da Bárbara — hoje a legenda é neutra de propósito | `conteudo/eventos.json` |
-| Data e crédito das fotos do Influent Summit | Legenda completa | `assets/manifest.json` |
+| Crédito fotográfico das fotos do Influent Summit | Legenda completa (data e local já vieram do crachá) | `assets/manifest.json` |
 | Confirmação do ano de entrada na HAOMA | Hoje 2026 é hipótese; se mudar, **toda a cronologia** muda junto (ver `conteudo/revisao-e-fontes.md`) | `conteudo/perfil.json` |
 | Confirmar o endereço final (com ou sem `www`) | `canonical`, `og:url` e o link impresso no currículo | `astro.config.mjs` ou `SITE_URL` |
 | PDF recompilado, sem os números simulados | Botão "Baixar currículo" | `curriculo/barbara-fraquete.pdf` |
@@ -234,9 +278,11 @@ Validado rodando de fato, não por inspeção de código:
 - **Rotas** — geradas: `/`, `/404`. Nenhuma rota de rascunho. A rota de case foi
   verificada publicando um case temporário e depois revertendo.
 - **Contraste WCAG AA** — todo elemento com texto visível teve a razão de contraste
-  calculada contra o fundo efetivo, a 1280 px e a 360 px: **0 reprovações** em 130 e 126
-  elementos, já com o conteúdo atualizado. Três combinações foram corrigidas nesse
-  processo, todas terracota sobre creme (3,76:1) em texto pequeno.
+  calculada contra o fundo efetivo, **nos dois temas**: 0 reprovações em 137 elementos no
+  tema escuro e 137 no claro, além de 130 e 126 nas medições anteriores a 1280 px e 360 px.
+  Correções feitas nesse processo: três combinações terracota sobre creme (3,76:1) em texto
+  pequeno, e as superfícies do tema escuro, que a 34% de oliva derrubavam a areia para
+  4,37:1.
 - **Responsividade** — 360, 640, 768 e 1440 px sem rolagem horizontal e sem elemento
   estourando o contêiner. 640 px equivale a zoom de 200% em 1280 px.
 - **Estrutura** — exatamente um `<h1>`, hierarquia de títulos sem saltos
@@ -285,6 +331,7 @@ site/
 │   └── sync-conteudo.mjs   Kit → site, aplicando a regra de publicUse
 ├── testes/
 │   └── publicacao.test.mjs 15 testes das regras de publicação (inclui o PDF)
+├── src/i18n/             Dicionários pt/en, tradução do conteúdo e rotas por idioma
 ├── public/                 Servido como está: PDF, favicon, imagem social, robots
 └── src/
     ├── assets/             Imagens processadas no build (5 fotos + decoração)
@@ -292,6 +339,7 @@ site/
     │                       GaleriaEventos, Sobre, Contato, Rodape, e auxiliares
     ├── data/               Conteúdo, tipos e a camada única de leitura (conteudo.ts)
     ├── layouts/Base.astro  <head>, metadados, fontes, skip link
-    ├── pages/              index.astro, trabalhos/[slug].astro, 404.astro
+    ├── pages/              index.astro, en/index.astro, trabalhos/[slug].astro,
+    │                       en/trabalhos/[slug].astro, 404.astro (bilíngue)
     └── styles/             tokens.css (paleta e escala) e global.css
 ```

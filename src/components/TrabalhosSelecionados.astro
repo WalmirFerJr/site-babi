@@ -1,0 +1,126 @@
+---
+import { Picture } from 'astro:assets';
+import { trabalhos } from '../data/textos';
+import { casesPublicados } from '../data/conteudo';
+import RotuloSecao from './RotuloSecao.astro';
+
+interface Props { numero?: string }
+const { numero } = Astro.props;
+
+/**
+ * Só renderiza com case publicado E imagem real (ver src/data/conteudo.ts).
+ * Rascunhos não viram card "em breve": a seção inteira simplesmente não existe.
+ */
+const [destaque, ...demais] = casesPublicados;
+---
+
+{destaque && (
+<section class="secao secao-trabalhos" id="trabalhos" aria-labelledby="titulo-trabalhos">
+  <div class="container">
+    <RotuloSecao numero={numero} texto="Trabalhos" />
+    <h2 class="trabalhos__titulo" id="titulo-trabalhos">{trabalhos.titulo}</h2>
+
+    <div class="trabalhos__grade">
+      <article class="trabalhos__item trabalhos__item--destaque">
+          <a class="trabalhos__link" href={`/trabalhos/${destaque.slug}`}>
+            {destaque.imagens[0] && (
+              <Picture
+                src={destaque.imagens[0].src}
+                alt={destaque.imagens[0].alt}
+                widths={[600, 900, 1400]}
+                sizes="(min-width: 62em) 60rem, 92vw"
+                loading="lazy"
+                decoding="async"
+                formats={['avif', 'webp']}
+                class="trabalhos__imagem"
+              />
+            )}
+            <div class="trabalhos__info">
+              <p class="trabalhos__empresa">{destaque.company}</p>
+              <h3 class="trabalhos__nome">{destaque.title}</h3>
+              {destaque.context && <p class="trabalhos__contexto">{destaque.context}</p>}
+          </div>
+        </a>
+      </article>
+
+      {demais.map((caso) => (
+        <article class="trabalhos__item">
+          <a class="trabalhos__link" href={`/trabalhos/${caso.slug}`}>
+            {caso.imagens[0] && (
+              <Picture
+                src={caso.imagens[0].src}
+                alt={caso.imagens[0].alt}
+                widths={[400, 800]}
+                sizes="(min-width: 62em) 30rem, 92vw"
+                loading="lazy"
+                decoding="async"
+                formats={['avif', 'webp']}
+                class="trabalhos__imagem"
+              />
+            )}
+            <div class="trabalhos__info">
+              <p class="trabalhos__empresa">{caso.company}</p>
+              <h3 class="trabalhos__nome">{caso.title}</h3>
+            </div>
+          </a>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+)}
+
+<style>
+  .trabalhos__titulo {
+    margin-block: var(--space-3) clamp(2rem, 4vw, 3rem);
+    max-width: 18ch;
+  }
+
+  .trabalhos__grade {
+    display: grid;
+    gap: clamp(1.5rem, 3vw, 2.5rem);
+  }
+
+  .trabalhos__link {
+    display: grid;
+    gap: var(--space-2);
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .trabalhos__link :global(picture) { display: block; }
+
+  .trabalhos__imagem {
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius);
+    transition: scale var(--duration) var(--ease);
+  }
+  .trabalhos__link:hover .trabalhos__imagem { scale: 1.01; }
+
+  .trabalhos__empresa {
+    font-family: var(--font-display);
+    font-size: var(--step-label);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-olive);
+  }
+
+  .trabalhos__nome {
+    margin-block-start: 0.25rem;
+    font-size: var(--step-h3);
+  }
+  .trabalhos__link:hover .trabalhos__nome { color: var(--color-terracotta); }
+
+  .trabalhos__contexto {
+    margin-block-start: 0.5rem;
+    max-width: var(--measure);
+    color: var(--color-olive);
+  }
+
+  @media (min-width: 62em) {
+    .trabalhos__grade { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+    .trabalhos__item--destaque { grid-column: 1 / -1; }
+  }
+</style>

@@ -4,15 +4,18 @@
     "title": "Influent Summit 2026",
     "kind": "Participação em evento",
     "year": 2026,
-    "date": null,
-    "description": "Registro de participação em evento, conforme informado pelo usuário. Ano legível no crachá.",
+    "date": "2026-06-24",
+    "description": "Participação no Influent Summit 2026, com credencial Full Pass.",
     "assetIds": [
-      "evento-1782411664005"
+      "evento-1782411664005",
+      "evento-q123-sem-qr"
     ],
     "privateAssetIds": [
       "evento-q123"
     ],
-    "status": "pronto-para-galeria"
+    "status": "pronto-para-galeria",
+    "dateLabel": "24 e 25 de junho de 2026",
+    "location": "Expo Center Norte, São Paulo"
   },
   {
     "slug": "projeto-scwepss",

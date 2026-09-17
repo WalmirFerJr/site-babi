@@ -109,6 +109,24 @@
       "note": "Participação informada pelo usuário; não atribuir organização, autoria de campanha ou vínculo com Schweppes."
     },
     {
+      "id": "evento-q123-sem-qr",
+      "path": "assets/eventos/influent summit/q123-cracha-sem-qr.jpeg",
+      "type": "event-photo",
+      "status": "received",
+      "derivedFrom": "evento-q123",
+      "alt": "Crachá Full Pass do Influent Summit 2026 em nome de Bárbara Andrade, segurado na mão durante o evento.",
+      "caption": "Credencial do Influent Summit 2026.",
+      "event": "Influent Summit 2026",
+      "date": "2026-06-24",
+      "year": 2026,
+      "barbaraRole": "Participante, conforme usuário",
+      "credit": null,
+      "width": 800,
+      "height": 1422,
+      "publicUse": true,
+      "note": "Versão publicável do crachá, gerada a pedido do usuário. O QR code foi destruído por pixelização (redução a 4x4 e reampliação), sem possibilidade de reconstrução: um QR de credencial costuma carregar dados de inscrição e captura de lead. Nome, passe e identidade do evento permanecem legíveis. O original evento-q123 continua privado."
+    },
+    {
       "id": "evento-q123",
       "path": "assets/eventos/influent summit/q123.jpeg",
       "type": "event-photo",
@@ -124,7 +142,7 @@
       "width": 800,
       "height": 1422,
       "publicUse": false,
-      "note": "Crachá com QR code: manter fora de public/."
+      "note": "Crachá com QR code legível: manter fora de public/. A versão publicável é evento-q123-sem-qr."
     }
   ],
   "pendingSlots": [

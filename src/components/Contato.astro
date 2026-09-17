@@ -1,0 +1,68 @@
+---
+import { contato } from '../data/textos';
+import { perfil } from '../data/conteudo';
+import RotuloSecao from './RotuloSecao.astro';
+
+/**
+ * Contato por mailto, sem formulário: nada é simulado como "enviado".
+ * Só o e-mail aparece; telefone, localização e redes não são inventados.
+ */
+interface Props { numero?: string }
+const { numero } = Astro.props;
+---
+
+<section class="secao secao-contato on-forest" id="contato" aria-labelledby="titulo-contato">
+  <div class="container">
+    <RotuloSecao numero={numero} texto="Contato" />
+
+    <h2 class="contato__titulo" id="titulo-contato">{contato.titulo}</h2>
+    <p class="contato__texto">{contato.texto}</p>
+
+    <a class="contato__email" href={`mailto:${perfil.email}`}>{perfil.email}</a>
+  </div>
+</section>
+
+<style>
+  .secao-contato {
+    background-color: var(--color-forest);
+    color: var(--color-cream);
+  }
+
+  .contato__titulo {
+    margin-block: var(--space-3) var(--space-2);
+    max-width: 22ch;
+    color: var(--color-cream);
+  }
+
+  .contato__texto {
+    max-width: 42ch;
+    font-size: var(--step-lead);
+    /* Areia sobre floresta: 5,72:1. */
+    color: var(--color-sand);
+  }
+
+  .contato__email {
+    display: inline-block;
+    margin-block-start: clamp(2rem, 4vw, 3rem);
+    padding-block: 0.5rem;
+    /* Alvo de toque generoso e quebra garantida em telas estreitas. */
+    min-height: 3rem;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.375rem, 0.7rem + 3.2vw, 3rem);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: var(--color-cream);
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.18em;
+    text-decoration-color: var(--color-sand);
+    overflow-wrap: anywhere;
+    transition: color var(--duration) var(--ease),
+                text-decoration-color var(--duration) var(--ease);
+  }
+  .contato__email:hover {
+    color: var(--color-sand);
+    text-decoration-color: var(--color-cream);
+  }
+</style>

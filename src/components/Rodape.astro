@@ -1,0 +1,48 @@
+---
+import { perfil, anoCorrente } from '../data/conteudo';
+import MarcaEditorial from './MarcaEditorial.astro';
+---
+
+<footer class="rodape">
+  <div class="container rodape__interno">
+    <p class="rodape__assinatura">
+      <MarcaEditorial class="rodape__marca" />
+      <span>{perfil.name} · {anoCorrente}</span>
+    </p>
+    <!-- Sem redes sociais, endereço ou disponibilidade: nada disso foi informado. -->
+    <p class="rodape__contato">
+      <a class="link" href={`mailto:${perfil.email}`}>{perfil.email}</a>
+    </p>
+  </div>
+</footer>
+
+<style>
+  .rodape {
+    padding-block: var(--space-4);
+    color: var(--color-cream);
+    background-color: var(--color-forest);
+    border-block-start: 1px solid color-mix(in srgb, var(--color-sand) 30%, transparent);
+  }
+
+  .rodape__interno {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    font-size: var(--step-small);
+  }
+
+  .rodape__assinatura {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+
+  .rodape__marca { width: 0.85em; height: 0.85em; color: var(--color-sand); }
+
+  .rodape__contato { color: var(--color-sand); }
+</style>

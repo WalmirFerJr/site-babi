@@ -197,9 +197,17 @@ no site pelo botão "Baixar currículo", passando por fora de todas as outras ve
 
 ### Retrato
 
-O hero já sabe usar um retrato: se houver um asset `"type": "portrait"` com
-`"publicUse": true` no manifesto, ele entra no lugar da composição abstrata, sem tocar em
-componente nenhum. Para adicionar:
+**Já existe um**: `assets/fotos/barbara-retrato-01.jpeg`, cadastrado como
+`retrato-principal` e exibido no hero, com um bloco de areia deslocado atrás — mesmo
+gesto da composição do kit, sem tocar na imagem em si.
+
+Ele é quadrado e tem 800 px no lado maior, abaixo dos 1600 px que o kit sugere. Como é
+exibido a cerca de 400 px, sai em densidade 2x e fica nítido; um original maior só
+ajudaria em telas muito grandes.
+
+O hero escolhe sozinho: havendo um asset `"type": "portrait"` com `"publicUse": true`,
+ele entra no lugar da composição abstrata, sem tocar em componente nenhum. Para trocar
+por outro arquivo:
 
 1. Salve o arquivo em `assets/fotos/` no kit, de preferência com 1600 px ou mais no lado
    maior — por exemplo `assets/fotos/barbara-retrato-01.jpg`.
@@ -221,6 +229,9 @@ componente nenhum. Para adicionar:
 
    `width` e `height` podem ficar em 0: quem mede a imagem é o build.
 3. `npm run sync:conteudo && npm run build`.
+
+Só um retrato é usado. A coluna do "Sobre" segue tipográfica de propósito — repetir a
+mesma foto duas vezes na página empobreceria as duas aparições.
 
 ### Logos das empresas
 
@@ -254,7 +265,7 @@ repositório.
 
 | Falta | Para quê | Onde entra |
 | --- | --- | --- |
-| **Retrato editorial** | Área visual do hero. O suporte já está pronto: basta o arquivo e a entrada no manifesto | `assets/fotos/` |
+| Retrato em resolução maior | O atual tem 800 px no lado maior; um original de 1600 px+ ganharia nitidez em telas grandes | `assets/fotos/` |
 | Logos de HAOMA, Digipix e Sorella Store | Trajetória com marca, em vez de só texto | `assets/logos/` |
 | Peças de campanha com autoria identificada | Primeiro case publicável | `assets/cases/` |
 | Contexto do "Projeto Scwepss" | Nome oficial, data, natureza e papel da Bárbara — hoje a legenda é neutra de propósito | `conteudo/eventos.json` |

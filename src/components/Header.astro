@@ -1,0 +1,217 @@
+---
+import { navegacao } from '../data/textos';
+import { perfil, temCases, temEventos } from '../data/conteudo';
+import MarcaEditorial from './MarcaEditorial.astro';
+
+const itens = navegacao.filter(
+  (item) =>
+    (!('dependeDeCases' in item) || temCases) &&
+    (!('dependeDeEventos' in item) || temEventos),
+);
+---
+
+<header class="cabecalho">
+  <div class="container cabecalho__interno">
+    <a class="cabecalho__marca" href="/">
+      <MarcaEditorial class="cabecalho__asterisco" />
+      <span>{perfil.name}</span>
+    </a>
+
+    <nav class="cabecalho__nav" aria-label="Seções da página">
+      <!--
+        Sem JavaScript o menu vira uma lista rolável horizontalmente no celular:
+        a navegação continua completa e utilizável. O botão abaixo só melhora isso.
+      -->
+      <button
+        type="button"
+        class="cabecalho__alternar"
+        aria-expanded="false"
+        aria-controls="menu-principal"
+        hidden
+      >
+        <span class="cabecalho__alternar-texto">Menu</span>
+        <span class="cabecalho__alternar-icone" aria-hidden="true"></span>
+      </button>
+
+      <ul class="cabecalho__lista" id="menu-principal">
+        {itens.map((item) => (
+          <li>
+            <a class="cabecalho__link" href={item.href}>{item.rotulo}</a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<script>
+  // Progressive enhancement: só ativa o menu recolhível se o JS rodar.
+  const alternar = document.querySelector<HTMLButtonElement>('.cabecalho__alternar');
+  const cabecalho = document.querySelector<HTMLElement>('.cabecalho');
+  const lista = document.getElementById('menu-principal');
+
+  if (alternar && cabecalho && lista) {
+    alternar.hidden = false;
+    cabecalho.dataset.aprimorado = 'true';
+
+    const fechar = () => {
+      cabecalho.dataset.aberto = 'false';
+      alternar.setAttribute('aria-expanded', 'false');
+    };
+
+    alternar.addEventListener('click', () => {
+      const aberto = alternar.getAttribute('aria-expanded') === 'true';
+      cabecalho.dataset.aberto = String(!aberto);
+      alternar.setAttribute('aria-expanded', String(!aberto));
+    });
+
+    // Ir para uma âncora fecha o menu; Escape devolve o foco ao botão.
+    lista.addEventListener('click', (evento) => {
+      if ((evento.target as HTMLElement).closest('a')) fechar();
+    });
+
+    document.addEventListener('keydown', (evento) => {
+      if (evento.key === 'Escape' && alternar.getAttribute('aria-expanded') === 'true') {
+        fechar();
+        alternar.focus();
+      }
+    });
+  }
+</script>
+
+<style>
+  .cabecalho {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background-color: color-mix(in srgb, var(--color-cream) 92%, transparent);
+    backdrop-filter: blur(8px);
+    border-block-end: 1px solid var(--rule);
+  }
+
+  .cabecalho__interno {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    min-height: 4.25rem;
+  }
+
+  .cabecalho__marca {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.0625rem;
+    letter-spacing: -0.015em;
+    text-decoration: none;
+    color: var(--color-forest);
+    white-space: nowrap;
+  }
+
+  .cabecalho__asterisco {
+    width: 0.8em;
+    height: 0.8em;
+    transition: rotate var(--duration) var(--ease);
+  }
+  .cabecalho__marca:hover .cabecalho__asterisco { rotate: 60deg; }
+
+  .cabecalho__lista {
+    display: flex;
+    align-items: center;
+    gap: clamp(0.75rem, 2.2vw, 1.75rem);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .cabecalho__link {
+    display: inline-block;
+    padding-block: 0.5rem;
+    font-size: var(--step-small);
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--color-olive);
+    white-space: nowrap;
+    border-block-end: 2px solid transparent;
+    transition: color var(--duration) var(--ease), border-color var(--duration) var(--ease);
+  }
+  .cabecalho__link:hover {
+    color: var(--color-forest);
+    border-block-end-color: var(--color-terracotta);
+  }
+
+  .cabecalho__alternar {
+    display: none;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    padding: 0.5rem 0.875rem;
+    font-size: var(--step-small);
+    font-weight: 600;
+    color: var(--color-forest);
+    background: transparent;
+    border: 2px solid var(--color-forest);
+    border-radius: var(--radius);
+    cursor: pointer;
+  }
+
+  /* Três traços que viram X — o estado também é anunciado por aria-expanded. */
+  .cabecalho__alternar-icone,
+  .cabecalho__alternar-icone::before,
+  .cabecalho__alternar-icone::after {
+    display: block;
+    width: 1rem;
+    height: 2px;
+    background-color: currentColor;
+    transition: translate var(--duration) var(--ease), rotate var(--duration) var(--ease);
+  }
+  .cabecalho__alternar-icone { position: relative; }
+  .cabecalho__alternar-icone::before,
+  .cabecalho__alternar-icone::after {
+    content: '';
+    position: absolute;
+  }
+  .cabecalho__alternar-icone::before { translate: 0 -5px; }
+  .cabecalho__alternar-icone::after { translate: 0 5px; }
+
+  .cabecalho[data-aberto='true'] .cabecalho__alternar-icone { background-color: transparent; }
+  .cabecalho[data-aberto='true'] .cabecalho__alternar-icone::before { translate: 0 0; rotate: 45deg; }
+  .cabecalho[data-aberto='true'] .cabecalho__alternar-icone::after { translate: 0 0; rotate: -45deg; }
+
+  @media (max-width: 47.99em) {
+    /* Sem JS: lista rolável. Com JS: menu recolhível. */
+    .cabecalho__lista {
+      overflow-x: auto;
+      scrollbar-width: none;
+      max-width: 62vw;
+      padding-inline-end: 0.25rem;
+    }
+    .cabecalho__lista::-webkit-scrollbar { display: none; }
+
+    .cabecalho[data-aprimorado='true'] .cabecalho__alternar { display: inline-flex; }
+
+    .cabecalho[data-aprimorado='true'] .cabecalho__lista {
+      position: absolute;
+      inset-inline: 0;
+      top: 100%;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0;
+      max-width: none;
+      overflow: visible;
+      padding: var(--space-2) var(--gutter) var(--space-3);
+      background-color: var(--color-cream);
+      border-block-end: 1px solid var(--rule);
+    }
+    .cabecalho[data-aprimorado='true'] .cabecalho__lista[id] { display: none; }
+    .cabecalho[data-aprimorado='true'][data-aberto='true'] .cabecalho__lista[id] { display: flex; }
+
+    .cabecalho[data-aprimorado='true'] .cabecalho__link {
+      padding-block: 0.875rem;
+      font-size: 1rem;
+      border-block-end: 1px solid var(--rule);
+    }
+  }
+</style>

@@ -1,0 +1,12 @@
+---
+interface Props {
+  /** Omitido quando a seção não faz parte da sequência numerada da home. */
+  numero?: string;
+  texto: string;
+}
+const { numero, texto } = Astro.props;
+---
+<p class="rotulo-secao">
+  {numero && <span class="rotulo-secao__numero" aria-hidden="true">{numero}</span>}
+  <span>{texto}</span>
+</p>

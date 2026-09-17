@@ -1,0 +1,16 @@
+---
+/** Asterisco decorativo do kit (assets/decoracao/marca-editorial.svg), inline para herdar currentColor. */
+interface Props { class?: string }
+const { class: classe } = Astro.props;
+---
+<svg
+  class:list={['marca-editorial', classe]}
+  viewBox="0 0 160 160"
+  fill="currentColor"
+  aria-hidden="true"
+  focusable="false"
+>
+  <rect x="68" y="10" width="24" height="140" rx="12" />
+  <rect x="68" y="10" width="24" height="140" rx="12" transform="rotate(60 80 80)" />
+  <rect x="68" y="10" width="24" height="140" rx="12" transform="rotate(120 80 80)" />
+</svg>

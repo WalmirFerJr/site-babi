@@ -1,0 +1,59 @@
+---
+import { Font } from 'astro:assets';
+import { meta } from '../data/textos';
+import { perfil } from '../data/conteudo';
+import '../styles/tokens.css';
+import '../styles/global.css';
+
+interface Props {
+  titulo?: string;
+  descricao?: string;
+}
+
+const { titulo = meta.titulo, descricao = meta.descricao } = Astro.props;
+
+/**
+ * Astro.site só existe quando SITE_URL é definido no build (ver astro.config.mjs).
+ * Sem domínio real, canonical e og:url são omitidos em vez de inventados.
+ */
+const base = Astro.site;
+const canonical = base ? new URL(Astro.url.pathname, base).href : null;
+const ogImage = base ? new URL('/og-barbara-fraquete.png', base).href : '/og-barbara-fraquete.png';
+---
+
+<!doctype html>
+<html lang={meta.idioma}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{titulo}</title>
+    <meta name="description" content={descricao} />
+    <meta name="author" content={perfil.name} />
+    {canonical && <link rel="canonical" href={canonical} />}
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={titulo} />
+    <meta property="og:description" content={descricao} />
+    <meta property="og:locale" content="pt_BR" />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="Composição gráfica editorial com o nome Bárbara Fraquete e o cargo Social Media Content Creator."
+    />
+    {canonical && <meta property="og:url" content={canonical} />}
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <meta name="theme-color" content="#fefae0" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <Font cssVariable="--fonte-titulo" preload />
+    <Font cssVariable="--fonte-corpo" preload />
+  </head>
+  <body>
+    <a class="pular-para-conteudo" href="#conteudo">Pular para o conteúdo</a>
+    <slot />
+  </body>
+</html>

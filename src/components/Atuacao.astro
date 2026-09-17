@@ -1,0 +1,85 @@
+---
+import { atuacao } from '../data/textos';
+import RotuloSecao from './RotuloSecao.astro';
+
+interface Props { numero?: string }
+const { numero } = Astro.props;
+---
+
+<section class="secao secao-atuacao" id="atuacao" aria-labelledby="titulo-atuacao">
+  <div class="container">
+    <RotuloSecao numero={numero} texto="Atuação" />
+
+    <h2 class="atuacao__titulo" id="titulo-atuacao">{atuacao.titulo}</h2>
+
+    <!-- Blocos tipográficos separados por linhas, não cartões. -->
+    <ul class="atuacao__lista">
+      {atuacao.blocos.map((bloco, indice) => (
+        <li class="atuacao__bloco">
+          <span class="atuacao__indice" aria-hidden="true">{String(indice + 1).padStart(2, '0')}</span>
+          <h3 class="atuacao__nome">{bloco.nome}</h3>
+          <p class="atuacao__texto">{bloco.texto}</p>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .atuacao__titulo {
+    margin-block: var(--space-3) clamp(2rem, 4vw, 3rem);
+    max-width: 18ch;
+  }
+
+  .atuacao__lista {
+    display: grid;
+    gap: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-block-start: 1px solid var(--rule);
+  }
+
+  .atuacao__bloco {
+    display: grid;
+    gap: var(--space-1) var(--space-3);
+    padding-block: clamp(1.5rem, 3vw, 2.25rem);
+    border-block-end: 1px solid var(--rule);
+  }
+
+  .atuacao__indice {
+    font-family: var(--font-display);
+    font-size: var(--step-label);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    /* Oliva sobre creme: 5,40:1. Terracota neste tamanho ficaria em 3,76:1. */
+    color: var(--color-olive);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .atuacao__nome {
+    font-size: var(--step-h3);
+    color: var(--color-forest);
+  }
+
+  .atuacao__texto {
+    max-width: var(--measure);
+    color: var(--color-olive);
+    line-height: 1.6;
+  }
+
+  @media (min-width: 48em) {
+    .atuacao__bloco {
+      grid-template-columns: 3rem minmax(0, 15rem) minmax(0, 1fr);
+      align-items: start;
+      gap: var(--space-4);
+    }
+    .atuacao__indice { padding-block-start: 0.35em; }
+  }
+
+  @media (min-width: 75em) {
+    .atuacao__bloco {
+      grid-template-columns: 4rem minmax(0, 18rem) minmax(0, 1fr);
+    }
+  }
+</style>

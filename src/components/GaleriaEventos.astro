@@ -1,11 +1,13 @@
 ---
 import { Picture, getImage } from 'astro:assets';
-import { eventos as textosEventos } from '../data/textos';
-import { eventosPublicados } from '../data/conteudo';
+import type { Idioma } from '../i18n';
+import { t } from '../i18n';
+import { obterEventos } from '../data/conteudo';
 import RotuloSecao from './RotuloSecao.astro';
 
-interface Props { numero?: string }
-const { numero } = Astro.props;
+interface Props { numero?: string; idioma: Idioma }
+const { numero, idioma } = Astro.props;
+const textosEventos = t(idioma).registros;
 
 /**
  * Registros de participação. As legendas são neutras de propósito:
@@ -13,7 +15,7 @@ const { numero } = Astro.props;
  * visíveis nas fotos. Papel específico ainda não informado pelo kit.
  */
 const grupos = await Promise.all(
-  eventosPublicados.map(async (evento) => ({
+  obterEventos(idioma).map(async (evento) => ({
     ...evento,
     imagens: await Promise.all(
       evento.imagens.map(async (imagem) => {
@@ -40,7 +42,7 @@ const grupos = await Promise.all(
 
 <section class="secao secao-registros" id="registros" aria-labelledby="titulo-registros">
   <div class="container">
-    <RotuloSecao numero={numero} texto="Registros" />
+    <RotuloSecao numero={numero} texto={textosEventos.rotulo} />
 
     <div class="registros__abertura">
       <h2 id="titulo-registros">{textosEventos.titulo}</h2>
@@ -52,6 +54,12 @@ const grupos = await Promise.all(
         <header class="registros__cabecalho">
           <h3 id={`grupo-${grupo.slug}`} class="registros__titulo">{grupo.title}</h3>
           <p class="registros__tipo">{grupo.kind}</p>
+          {/* Data e local só aparecem quando conhecidos — nunca inferidos. */}
+          {(grupo.dateLabel || grupo.location) && (
+            <p class="registros__quando">
+              {[grupo.dateLabel, grupo.location].filter(Boolean).join(' · ')}
+            </p>
+          )}
         </header>
 
         <ul class="registros__grade">
@@ -77,14 +85,14 @@ const grupos = await Promise.all(
                     data-legenda={imagem.legenda ?? ''}
                     hidden
                   >
-                    <span class="visualmente-oculto">Ampliar imagem: {imagem.alt}</span>
+                    <span class="visualmente-oculto">{textosEventos.ampliar}: {imagem.alt}</span>
                     <span class="registros__lupa" aria-hidden="true">+</span>
                   </button>
                 </div>
                 {imagem.legenda && (
                   <figcaption class="registros__legenda">
                     {imagem.legenda}
-                    {imagem.credito && <span class="registros__credito"> Foto: {imagem.credito}.</span>}
+                    {imagem.credito && <span class="registros__credito"> {textosEventos.foto}: {imagem.credito}.</span>}
                   </figcaption>
                 )}
               </figure>
@@ -97,10 +105,10 @@ const grupos = await Promise.all(
 </section>
 
 <!-- Ampliação: <dialog> nativo dá Escape, foco retido e fundo inerte sem biblioteca. -->
-<dialog class="visor" aria-label="Imagem ampliada">
+<dialog class="visor" aria-label={textosEventos.imagemAmpliada}>
   <div class="visor__conteudo">
     <button type="button" class="visor__fechar" autofocus>
-      <span class="visualmente-oculto">Fechar imagem ampliada</span>
+      <span class="visualmente-oculto">{textosEventos.fechar}</span>
       <span aria-hidden="true">×</span>
     </button>
     <img class="visor__imagem" alt="" />
@@ -182,7 +190,7 @@ const grupos = await Promise.all(
 </script>
 
 <style>
-  .secao-registros { background-color: color-mix(in srgb, var(--color-sand) 14%, var(--color-cream)); }
+  .secao-registros { background-color: var(--surface-alt); }
 
   .registros__abertura {
     display: grid;
@@ -193,7 +201,7 @@ const grupos = await Promise.all(
   .registros__intro {
     max-width: var(--measure);
     font-size: var(--step-lead);
-    color: var(--color-olive);
+    color: var(--text-muted);
   }
 
   .registros__grupo + .registros__grupo { margin-block-start: clamp(2.5rem, 5vw, 4rem); }
@@ -210,13 +218,19 @@ const grupos = await Promise.all(
 
   .registros__titulo { font-size: var(--step-h3); }
 
+  .registros__quando {
+    flex-basis: 100%;
+    font-size: var(--step-small);
+    color: var(--text-muted);
+  }
+
   .registros__tipo {
     font-family: var(--font-display);
     font-size: var(--step-label);
     font-weight: 700;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: var(--color-olive);
+    color: var(--text-muted);
   }
 
   .registros__grade {
@@ -234,7 +248,7 @@ const grupos = await Promise.all(
     position: relative;
     overflow: hidden;
     border-radius: var(--radius);
-    background-color: color-mix(in srgb, var(--color-olive) 12%, var(--color-cream));
+    background-color: var(--surface-raised);
   }
 
   .registros__moldura :global(picture) { display: block; }
@@ -282,10 +296,10 @@ const grupos = await Promise.all(
     margin-block-start: 0.75rem;
     font-size: var(--step-small);
     line-height: 1.5;
-    color: var(--color-olive);
+    color: var(--text-muted);
     max-width: 46ch;
   }
-  .registros__credito { color: var(--color-olive); }
+  .registros__credito { color: var(--text-muted); }
 
   @media (min-width: 48em) {
     /* Duas colunas com alturas naturais: retratos e paisagens convivem sem recorte,
@@ -314,7 +328,7 @@ const grupos = await Promise.all(
     border: 0;
     border-radius: var(--radius);
   }
-  .visor::backdrop { background-color: rgb(40 54 24 / 0.82); }
+  .visor::backdrop { background-color: var(--sombra-visor); }
 
   .visor__conteudo {
     position: relative;
@@ -332,7 +346,7 @@ const grupos = await Promise.all(
 
   .visor__legenda {
     font-size: var(--step-small);
-    color: var(--color-sand);
+    color: var(--on-invert-muted);
     text-align: center;
   }
   .visor__legenda:empty { display: none; }

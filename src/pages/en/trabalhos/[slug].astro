@@ -1,0 +1,22 @@
+---
+import type { GetStaticPaths } from 'astro';
+import Base from '../../../layouts/Base.astro';
+import PaginaCase from '../../../components/PaginaCase.astro';
+import type { CasePublicado } from '../../../data/conteudo';
+import { obterCases, perfil } from '../../../data/conteudo';
+
+export const getStaticPaths: GetStaticPaths = () =>
+  obterCases('en').map((caso) => ({ params: { slug: caso.slug }, props: { caso } }));
+
+interface Props { caso: CasePublicado }
+const { caso } = Astro.props;
+---
+
+<Base
+  idioma="en"
+  caminho={`/trabalhos/${caso.slug}`}
+  titulo={`${caso.title} | ${perfil.name}`}
+  descricao={caso.context ?? `${caso.title}, a project by ${perfil.name}.`}
+>
+  <PaginaCase caso={caso} idioma="en" />
+</Base>

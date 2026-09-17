@@ -1,24 +1,24 @@
 ---
-import { trajetoria } from '../data/textos';
-import { experiencias } from '../data/conteudo';
+import type { Idioma } from '../i18n';
+import { t } from '../i18n';
+import { obterExperiencias } from '../data/conteudo';
 import RotuloSecao from './RotuloSecao.astro';
 
-interface Props { numero?: string }
-const { numero } = Astro.props;
+interface Props { numero?: string; idioma: Idioma }
+const { numero, idioma } = Astro.props;
+const d = t(idioma);
+const trajetoria = d.trajetoria;
 
 /**
  * Cargos nunca são fundidos: os dois vínculos na Digipix aparecem como entradas
  * distintas. A repetição do empregador só muda o agrupamento visual.
  */
-const entradas = experiencias.map((experiencia, indice) => ({
-  ...experiencia,
-  agrupada: indice > 0 && experiencias[indice - 1]!.company === experiencia.company,
-}));
+const entradas = obterExperiencias(idioma);
 ---
 
 <section class="secao secao-trajetoria" id="trajetoria" aria-labelledby="titulo-trajetoria">
   <div class="container">
-    <RotuloSecao numero={numero} texto="Trajetória" />
+    <RotuloSecao numero={numero} texto={trajetoria.rotulo} />
 
     <div class="trajetoria__abertura">
       <h2 id="titulo-trajetoria">{trajetoria.titulo}</h2>
@@ -30,7 +30,7 @@ const entradas = experiencias.map((experiencia, indice) => ({
         <li class="trajetoria__item" data-agrupada={String(entrada.agrupada)}>
           <div class="trajetoria__periodo">
             <span class="trajetoria__datas">{entrada.period}</span>
-            {entrada.current && <span class="trajetoria__atual">Atual</span>}
+            {entrada.current && <span class="trajetoria__atual">{trajetoria.atual}</span>}
           </div>
 
           <div class="trajetoria__corpo">
@@ -64,7 +64,7 @@ const entradas = experiencias.map((experiencia, indice) => ({
   .trajetoria__intro {
     max-width: var(--measure);
     font-size: var(--step-lead);
-    color: var(--color-olive);
+    color: var(--text-muted);
   }
 
   .trajetoria__lista {
@@ -83,7 +83,7 @@ const entradas = experiencias.map((experiencia, indice) => ({
   /* Entradas do mesmo empregador ficam visualmente ligadas por um filete mais leve. */
   .trajetoria__item[data-agrupada='true'] {
     border-block-start-style: dashed;
-    border-block-start-color: color-mix(in srgb, var(--color-olive) 22%, transparent);
+    border-block-start-color: color-mix(in srgb, var(--rule) 60%, transparent);
   }
   .trajetoria__item:last-child { border-block-end: 1px solid var(--rule); }
 
@@ -99,7 +99,7 @@ const entradas = experiencias.map((experiencia, indice) => ({
     font-size: var(--step-small);
     font-weight: 700;
     letter-spacing: 0.06em;
-    color: var(--color-olive);
+    color: var(--text-muted);
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
   }
@@ -118,7 +118,7 @@ const entradas = experiencias.map((experiencia, indice) => ({
 
   .trajetoria__cargo {
     font-size: var(--step-h3);
-    color: var(--color-forest);
+    color: var(--text);
   }
 
   .trajetoria__empresa {
@@ -129,7 +129,7 @@ const entradas = experiencias.map((experiencia, indice) => ({
     font-size: 1.25rem;
     font-weight: 700;
     letter-spacing: 0.02em;
-    color: var(--color-terracotta);
+    color: var(--accent);
   }
 
   /* Faixa de palavras-chave do cargo, no espírito das tarjas do currículo. */
@@ -146,7 +146,7 @@ const entradas = experiencias.map((experiencia, indice) => ({
     font-weight: 700;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: var(--color-olive);
+    color: var(--text-muted);
   }
   .trajetoria__chaves li {
     display: flex;
@@ -158,7 +158,7 @@ const entradas = experiencias.map((experiencia, indice) => ({
     width: 4px;
     height: 4px;
     border-radius: 50%;
-    background-color: var(--color-terracotta);
+    background-color: var(--accent);
   }
 
   .trajetoria__atividades {
@@ -167,11 +167,11 @@ const entradas = experiencias.map((experiencia, indice) => ({
     margin-block-start: var(--space-2);
     max-width: var(--measure);
     padding-inline-start: 1.1rem;
-    color: var(--color-olive);
+    color: var(--text-muted);
     line-height: 1.6;
   }
   .trajetoria__atividades li { padding-inline-start: 0.35rem; }
-  .trajetoria__atividades li::marker { color: var(--color-terracotta); }
+  .trajetoria__atividades li::marker { color: var(--accent); }
 
   @media (min-width: 48em) {
     .trajetoria__item {

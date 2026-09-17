@@ -3,21 +3,34 @@ import Base from '../layouts/Base.astro';
 import Header from '../components/Header.astro';
 import Rodape from '../components/Rodape.astro';
 import MarcaEditorial from '../components/MarcaEditorial.astro';
+import { t, rota } from '../i18n';
 import { perfil } from '../data/conteudo';
+
+/**
+ * Página 404 única, servida para qualquer endereço desconhecido — inclusive os
+ * que começam com /en. Como não dá para saber o idioma de quem chegou, ela fala
+ * os dois: o texto principal em português e uma linha curta em inglês.
+ */
+const pt = t('pt').erro404;
+const en = t('en').erro404;
 ---
 
-<Base titulo={`Página não encontrada | ${perfil.name}`} descricao="A página procurada não existe neste site.">
-  <Header />
+<Base idioma="pt" titulo={`${pt.meta} | ${perfil.name}`} descricao={pt.descricao}>
+  <Header idioma="pt" />
   <main id="conteudo" class="secao erro">
     <div class="container erro__interno">
       <MarcaEditorial class="erro__marca" />
       <p class="erro__codigo">404</p>
-      <h1 class="erro__titulo">Essa página saiu do calendário.</h1>
-      <p class="erro__texto">O endereço não existe ou mudou de lugar. Volte para o início e siga a partir de lá.</p>
-      <p>
-        <a class="botao botao--principal" href="/">
-          Voltar ao início
+      <h1 class="erro__titulo">{pt.titulo}</h1>
+      <p class="erro__texto">{pt.texto}</p>
+      <p class="erro__texto erro__texto--en" lang="en">{en.texto}</p>
+      <p class="erro__acoes">
+        <a class="botao botao--principal" href={rota('pt')}>
+          {pt.voltar}
           <span class="seta" aria-hidden="true">→</span>
+        </a>
+        <a class="botao botao--secundario" href={rota('en')} lang="en" hreflang="en">
+          {en.voltar}
         </a>
       </p>
     </div>
@@ -34,8 +47,10 @@ import { perfil } from '../data/conteudo';
     font-size: var(--step-label);
     font-weight: 700;
     letter-spacing: 0.2em;
-    color: var(--color-olive);
+    color: var(--text-muted);
   }
   .erro__titulo { max-width: 14ch; }
-  .erro__texto { max-width: var(--measure); font-size: var(--step-lead); color: var(--color-olive); }
+  .erro__texto { max-width: var(--measure); font-size: var(--step-lead); color: var(--text-muted); }
+  .erro__texto--en { font-size: var(--step-body); opacity: 0.85; }
+  .erro__acoes { display: flex; flex-wrap: wrap; gap: var(--space-2); }
 </style>

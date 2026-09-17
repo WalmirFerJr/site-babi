@@ -1,14 +1,16 @@
 ---
-import { atuacao } from '../data/textos';
+import type { Idioma } from '../i18n';
+import { t } from '../i18n';
 import RotuloSecao from './RotuloSecao.astro';
 
-interface Props { numero?: string }
-const { numero } = Astro.props;
+interface Props { numero?: string; idioma: Idioma }
+const { numero, idioma } = Astro.props;
+const atuacao = t(idioma).atuacao;
 ---
 
 <section class="secao secao-atuacao" id="atuacao" aria-labelledby="titulo-atuacao">
   <div class="container">
-    <RotuloSecao numero={numero} texto="Atuação" />
+    <RotuloSecao numero={numero} texto={atuacao.rotulo} />
 
     <h2 class="atuacao__titulo" id="titulo-atuacao">{atuacao.titulo}</h2>
 
@@ -53,18 +55,18 @@ const { numero } = Astro.props;
     font-weight: 700;
     letter-spacing: 0.1em;
     /* Oliva sobre creme: 5,40:1. Terracota neste tamanho ficaria em 3,76:1. */
-    color: var(--color-olive);
+    color: var(--text-muted);
     font-variant-numeric: tabular-nums;
   }
 
   .atuacao__nome {
     font-size: var(--step-h3);
-    color: var(--color-forest);
+    color: var(--text);
   }
 
   .atuacao__texto {
     max-width: var(--measure);
-    color: var(--color-olive);
+    color: var(--text-muted);
     line-height: 1.6;
   }
 

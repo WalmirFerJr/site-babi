@@ -1,28 +1,30 @@
 ---
 import { Picture } from 'astro:assets';
-import { trabalhos } from '../data/textos';
-import { casesPublicados } from '../data/conteudo';
+import type { Idioma } from '../i18n';
+import { t, rota } from '../i18n';
+import { obterCases } from '../data/conteudo';
 import RotuloSecao from './RotuloSecao.astro';
 
-interface Props { numero?: string }
-const { numero } = Astro.props;
+interface Props { numero?: string; idioma: Idioma }
+const { numero, idioma } = Astro.props;
+const trabalhos = t(idioma).trabalhos;
 
 /**
  * Só renderiza com case publicado E imagem real (ver src/data/conteudo.ts).
  * Rascunhos não viram card "em breve": a seção inteira simplesmente não existe.
  */
-const [destaque, ...demais] = casesPublicados;
+const [destaque, ...demais] = obterCases(idioma);
 ---
 
 {destaque && (
 <section class="secao secao-trabalhos" id="trabalhos" aria-labelledby="titulo-trabalhos">
   <div class="container">
-    <RotuloSecao numero={numero} texto="Trabalhos" />
+    <RotuloSecao numero={numero} texto={trabalhos.rotulo} />
     <h2 class="trabalhos__titulo" id="titulo-trabalhos">{trabalhos.titulo}</h2>
 
     <div class="trabalhos__grade">
       <article class="trabalhos__item trabalhos__item--destaque">
-          <a class="trabalhos__link" href={`/trabalhos/${destaque.slug}`}>
+          <a class="trabalhos__link" href={rota(idioma, `/trabalhos/${destaque.slug}`)}>
             {destaque.imagens[0] && (
               <Picture
                 src={destaque.imagens[0].src}
@@ -45,7 +47,7 @@ const [destaque, ...demais] = casesPublicados;
 
       {demais.map((caso) => (
         <article class="trabalhos__item">
-          <a class="trabalhos__link" href={`/trabalhos/${caso.slug}`}>
+          <a class="trabalhos__link" href={rota(idioma, `/trabalhos/${caso.slug}`)}>
             {caso.imagens[0] && (
               <Picture
                 src={caso.imagens[0].src}
@@ -104,19 +106,19 @@ const [destaque, ...demais] = casesPublicados;
     font-weight: 700;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: var(--color-olive);
+    color: var(--text-muted);
   }
 
   .trabalhos__nome {
     margin-block-start: 0.25rem;
     font-size: var(--step-h3);
   }
-  .trabalhos__link:hover .trabalhos__nome { color: var(--color-terracotta); }
+  .trabalhos__link:hover .trabalhos__nome { color: var(--accent); }
 
   .trabalhos__contexto {
     margin-block-start: 0.5rem;
     max-width: var(--measure);
-    color: var(--color-olive);
+    color: var(--text-muted);
   }
 
   @media (min-width: 62em) {

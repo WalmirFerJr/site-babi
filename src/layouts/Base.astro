@@ -1,40 +1,60 @@
 ---
 import { Font } from 'astro:assets';
-import { meta } from '../data/textos';
+import type { Idioma } from '../i18n';
+import { t, rota, IDIOMAS, METADADOS_IDIOMA, IDIOMA_PADRAO } from '../i18n';
+import ScriptTema from '../components/ScriptTema.astro';
 import { perfil } from '../data/conteudo';
 import '../styles/tokens.css';
 import '../styles/global.css';
 
 interface Props {
+  idioma: Idioma;
   titulo?: string;
   descricao?: string;
+  /** Caminho sem prefixo de idioma, para montar os alternates. Ex.: "/" ou "/trabalhos/x". */
+  caminho?: string;
 }
 
-const { titulo = meta.titulo, descricao = meta.descricao } = Astro.props;
+const { idioma, titulo, descricao, caminho = '/' } = Astro.props;
+const d = t(idioma);
+const meta = METADADOS_IDIOMA[idioma];
 
 /**
- * Astro.site só existe quando SITE_URL é definido no build (ver astro.config.mjs).
- * Sem domínio real, canonical e og:url são omitidos em vez de inventados.
+ * Astro.site só existe quando há endereço configurado (ver astro.config.mjs).
+ * Sem domínio, canonical, og:url e alternates são omitidos em vez de inventados.
  */
 const base = Astro.site;
-const canonical = base ? new URL(Astro.url.pathname, base).href : null;
+const url = (caminhoIdioma: string) => (base ? new URL(caminhoIdioma, base).href : null);
+const canonical = url(rota(idioma, caminho));
 const ogImage = base ? new URL('/og-barbara-fraquete.png', base).href : '/og-barbara-fraquete.png';
 ---
 
 <!doctype html>
-<html lang={meta.idioma}>
+<html lang={meta.lang}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{titulo}</title>
-    <meta name="description" content={descricao} />
+    <ScriptTema />
+    <title>{titulo ?? d.meta.titulo}</title>
+    <meta name="description" content={descricao ?? d.meta.descricao} />
     <meta name="author" content={perfil.name} />
     {canonical && <link rel="canonical" href={canonical} />}
 
+    {/* Alternates só com domínio real: sem ele, apontariam para lugar nenhum. */}
+    {base &&
+      IDIOMAS.map((outro) => (
+        <link
+          rel="alternate"
+          hreflang={METADADOS_IDIOMA[outro].lang}
+          href={url(rota(outro, caminho))}
+        />
+      ))}
+    {base && <link rel="alternate" hreflang="x-default" href={url(rota(IDIOMA_PADRAO, caminho))} />}
+
     <meta property="og:type" content="website" />
-    <meta property="og:title" content={titulo} />
-    <meta property="og:description" content={descricao} />
-    <meta property="og:locale" content="pt_BR" />
+    <meta property="og:title" content={titulo ?? d.meta.titulo} />
+    <meta property="og:description" content={descricao ?? d.meta.descricao} />
+    <meta property="og:locale" content={meta.ogLocale} />
     <meta property="og:image" content={ogImage} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
@@ -45,7 +65,8 @@ const ogImage = base ? new URL('/og-barbara-fraquete.png', base).href : '/og-bar
     {canonical && <meta property="og:url" content={canonical} />}
     <meta name="twitter:card" content="summary_large_image" />
 
-    <meta name="theme-color" content="#fefae0" />
+    <meta name="theme-color" content="#fefae0" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#283618" media="(prefers-color-scheme: dark)" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
@@ -53,7 +74,56 @@ const ogImage = base ? new URL('/og-barbara-fraquete.png', base).href : '/og-bar
     <Font cssVariable="--fonte-corpo" preload />
   </head>
   <body>
-    <a class="pular-para-conteudo" href="#conteudo">Pular para o conteúdo</a>
+    <a class="pular-para-conteudo" href="#conteudo">{d.navegacao.pularParaConteudo}</a>
     <slot />
+
+    <script>
+      // Alternância de tema. O <head> já aplicou o tema inicial; aqui só ligamos o botão.
+      const botao = document.querySelector<HTMLButtonElement>('.tema');
+      if (botao) {
+        const raiz = document.documentElement;
+        const texto = botao.querySelector<HTMLElement>('.tema__texto');
+
+        const sincronizar = () => {
+          const escuro = raiz.dataset.tema === 'escuro';
+          botao.setAttribute('aria-pressed', String(escuro));
+          // O rótulo descreve a ação, não o estado: é o que um leitor de tela anuncia.
+          const rotulo = escuro ? botao.dataset.rotuloClaro : botao.dataset.rotuloEscuro;
+          if (rotulo) {
+            botao.setAttribute('aria-label', rotulo);
+            if (texto) texto.textContent = rotulo;
+          }
+        };
+
+        botao.hidden = false;
+        sincronizar();
+
+        botao.addEventListener('click', () => {
+          const escuro = raiz.dataset.tema === 'escuro';
+          if (escuro) delete raiz.dataset.tema;
+          else raiz.dataset.tema = 'escuro';
+          try {
+            localStorage.setItem('tema', escuro ? 'claro' : 'escuro');
+          } catch (e) {
+            /* storage bloqueado: a escolha vale só nesta página */
+          }
+          sincronizar();
+        });
+
+        // Sem escolha explícita salva, o site continua seguindo o sistema.
+        matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (evento) => {
+          let salvo = null;
+          try {
+            salvo = localStorage.getItem('tema');
+          } catch (e) {
+            /* ignora */
+          }
+          if (salvo) return;
+          if (evento.matches) raiz.dataset.tema = 'escuro';
+          else delete raiz.dataset.tema;
+          sincronizar();
+        });
+      }
+    </script>
   </body>
 </html>

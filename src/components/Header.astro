@@ -1,46 +1,73 @@
 ---
-import { navegacao } from '../data/textos';
-import { perfil, temCases, temEventos } from '../data/conteudo';
+import type { Idioma } from '../i18n';
+import { t, rota, outroIdioma, METADADOS_IDIOMA } from '../i18n';
+import { temCases, temEventos } from '../data/conteudo';
 import MarcaEditorial from './MarcaEditorial.astro';
+import ControleTema from './ControleTema.astro';
 
-const itens = navegacao.filter(
-  (item) =>
-    (!('dependeDeCases' in item) || temCases) &&
-    (!('dependeDeEventos' in item) || temEventos),
-);
+interface Props { idioma: Idioma }
+const { idioma } = Astro.props;
+const d = t(idioma);
+const alvo = outroIdioma(idioma);
+
+const itens = [
+  { rotulo: d.navegacao.atuacao, href: '#atuacao', mostrar: true },
+  { rotulo: d.navegacao.trajetoria, href: '#trajetoria', mostrar: true },
+  { rotulo: d.navegacao.trabalhos, href: '#trabalhos', mostrar: temCases },
+  { rotulo: d.navegacao.registros, href: '#registros', mostrar: temEventos },
+  { rotulo: d.navegacao.sobre, href: '#sobre', mostrar: true },
+  { rotulo: d.navegacao.contato, href: '#contato', mostrar: true },
+].filter((item) => item.mostrar);
 ---
 
 <header class="cabecalho">
   <div class="container cabecalho__interno">
-    <a class="cabecalho__marca" href="/">
+    <a class="cabecalho__marca" href={rota(idioma)}>
       <MarcaEditorial class="cabecalho__asterisco" />
-      <span>{perfil.name}</span>
+      <span>Bárbara Fraquete</span>
     </a>
 
-    <nav class="cabecalho__nav" aria-label="Seções da página">
-      <!--
-        Sem JavaScript o menu vira uma lista rolável horizontalmente no celular:
-        a navegação continua completa e utilizável. O botão abaixo só melhora isso.
-      -->
-      <button
-        type="button"
-        class="cabecalho__alternar"
-        aria-expanded="false"
-        aria-controls="menu-principal"
-        hidden
-      >
-        <span class="cabecalho__alternar-texto">Menu</span>
-        <span class="cabecalho__alternar-icone" aria-hidden="true"></span>
-      </button>
+    <div class="cabecalho__direita">
+      <nav class="cabecalho__nav" aria-label={d.navegacao.seccoesDaPagina}>
+        <!--
+          Sem JavaScript o menu vira uma lista rolável horizontalmente no celular:
+          a navegação continua completa e utilizável. O botão abaixo só melhora isso.
+        -->
+        <button
+          type="button"
+          class="cabecalho__alternar"
+          aria-expanded="false"
+          aria-controls="menu-principal"
+          hidden
+        >
+          <span>{d.navegacao.menu}</span>
+          <span class="cabecalho__alternar-icone" aria-hidden="true"></span>
+        </button>
 
-      <ul class="cabecalho__lista" id="menu-principal">
-        {itens.map((item) => (
-          <li>
-            <a class="cabecalho__link" href={item.href}>{item.rotulo}</a>
-          </li>
-        ))}
-      </ul>
-    </nav>
+        <ul class="cabecalho__lista" id="menu-principal">
+          {itens.map((item) => (
+            <li><a class="cabecalho__link" href={item.href}>{item.rotulo}</a></li>
+          ))}
+        </ul>
+      </nav>
+
+      <div class="cabecalho__controles">
+        <ControleTema rotuloClaro={d.controles.temaClaro} rotuloEscuro={d.controles.temaEscuro} />
+        <!--
+          Troca de idioma é um link para a outra rota, não um botão de JavaScript:
+          funciona sem script, pode ser aberto em nova aba e é indexável.
+        -->
+        <a
+          class="cabecalho__idioma"
+          href={rota(alvo)}
+          lang={METADADOS_IDIOMA[alvo].lang}
+          hreflang={METADADOS_IDIOMA[alvo].lang}
+        >
+          <span aria-hidden="true">{d.controles.siglaIdioma}</span>
+          <span class="visualmente-oculto">{d.controles.trocarIdioma}</span>
+        </a>
+      </div>
+    </div>
   </div>
 </header>
 
@@ -65,7 +92,6 @@ const itens = navegacao.filter(
       alternar.setAttribute('aria-expanded', String(!aberto));
     });
 
-    // Ir para uma âncora fecha o menu; Escape devolve o foco ao botão.
     lista.addEventListener('click', (evento) => {
       if ((evento.target as HTMLElement).closest('a')) fechar();
     });
@@ -84,7 +110,7 @@ const itens = navegacao.filter(
     position: sticky;
     top: 0;
     z-index: 50;
-    background-color: color-mix(in srgb, var(--color-cream) 92%, transparent);
+    background-color: color-mix(in srgb, var(--surface) 92%, transparent);
     backdrop-filter: blur(8px);
     border-block-end: 1px solid var(--rule);
   }
@@ -93,8 +119,20 @@ const itens = navegacao.filter(
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: var(--space-3);
+    gap: var(--space-2);
     min-height: 4.25rem;
+  }
+
+  .cabecalho__direita {
+    display: flex;
+    align-items: center;
+    gap: clamp(0.5rem, 1.5vw, 1.25rem);
+  }
+
+  .cabecalho__controles {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
   }
 
   .cabecalho__marca {
@@ -106,7 +144,7 @@ const itens = navegacao.filter(
     font-size: 1.0625rem;
     letter-spacing: -0.015em;
     text-decoration: none;
-    color: var(--color-forest);
+    color: var(--text);
     white-space: nowrap;
   }
 
@@ -120,7 +158,7 @@ const itens = navegacao.filter(
   .cabecalho__lista {
     display: flex;
     align-items: center;
-    gap: clamp(0.75rem, 2.2vw, 1.75rem);
+    gap: clamp(0.75rem, 1.8vw, 1.5rem);
     margin: 0;
     padding: 0;
     list-style: none;
@@ -132,15 +170,33 @@ const itens = navegacao.filter(
     font-size: var(--step-small);
     font-weight: 600;
     text-decoration: none;
-    color: var(--color-olive);
+    color: var(--text-muted);
     white-space: nowrap;
     border-block-end: 2px solid transparent;
     transition: color var(--duration) var(--ease), border-color var(--duration) var(--ease);
   }
   .cabecalho__link:hover {
-    color: var(--color-forest);
-    border-block-end-color: var(--color-terracotta);
+    color: var(--text);
+    border-block-end-color: var(--accent);
   }
+
+  .cabecalho__idioma {
+    display: inline-grid;
+    place-items: center;
+    min-width: 2.75rem;
+    height: 2.75rem;
+    padding-inline: 0.5rem;
+    font-family: var(--font-display);
+    font-size: var(--step-label);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-decoration: none;
+    color: var(--text-muted);
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    transition: color var(--duration) var(--ease), border-color var(--duration) var(--ease);
+  }
+  .cabecalho__idioma:hover { color: var(--text); border-color: var(--text-muted); }
 
   .cabecalho__alternar {
     display: none;
@@ -150,14 +206,13 @@ const itens = navegacao.filter(
     padding: 0.5rem 0.875rem;
     font-size: var(--step-small);
     font-weight: 600;
-    color: var(--color-forest);
+    color: var(--text);
     background: transparent;
-    border: 2px solid var(--color-forest);
+    border: 2px solid var(--action-border);
     border-radius: var(--radius);
     cursor: pointer;
   }
 
-  /* Três traços que viram X — o estado também é anunciado por aria-expanded. */
   .cabecalho__alternar-icone,
   .cabecalho__alternar-icone::before,
   .cabecalho__alternar-icone::after {
@@ -169,10 +224,7 @@ const itens = navegacao.filter(
   }
   .cabecalho__alternar-icone { position: relative; }
   .cabecalho__alternar-icone::before,
-  .cabecalho__alternar-icone::after {
-    content: '';
-    position: absolute;
-  }
+  .cabecalho__alternar-icone::after { content: ''; position: absolute; }
   .cabecalho__alternar-icone::before { translate: 0 -5px; }
   .cabecalho__alternar-icone::after { translate: 0 5px; }
 
@@ -180,13 +232,11 @@ const itens = navegacao.filter(
   .cabecalho[data-aberto='true'] .cabecalho__alternar-icone::before { translate: 0 0; rotate: 45deg; }
   .cabecalho[data-aberto='true'] .cabecalho__alternar-icone::after { translate: 0 0; rotate: -45deg; }
 
-  @media (max-width: 47.99em) {
-    /* Sem JS: lista rolável. Com JS: menu recolhível. */
+  @media (max-width: 61.99em) {
     .cabecalho__lista {
       overflow-x: auto;
       scrollbar-width: none;
-      max-width: 62vw;
-      padding-inline-end: 0.25rem;
+      max-width: 38vw;
     }
     .cabecalho__lista::-webkit-scrollbar { display: none; }
 
@@ -202,7 +252,7 @@ const itens = navegacao.filter(
       max-width: none;
       overflow: visible;
       padding: var(--space-2) var(--gutter) var(--space-3);
-      background-color: var(--color-cream);
+      background-color: var(--surface);
       border-block-end: 1px solid var(--rule);
     }
     .cabecalho[data-aprimorado='true'] .cabecalho__lista[id] { display: none; }
@@ -213,5 +263,9 @@ const itens = navegacao.filter(
       font-size: 1rem;
       border-block-end: 1px solid var(--rule);
     }
+  }
+
+  @media (max-width: 30em) {
+    .cabecalho__marca span:last-child { display: none; }
   }
 </style>

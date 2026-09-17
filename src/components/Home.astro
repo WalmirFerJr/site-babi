@@ -1,0 +1,45 @@
+---
+import type { Idioma } from '../i18n';
+import Header from './Header.astro';
+import Hero from './Hero.astro';
+import Atuacao from './Atuacao.astro';
+import Trajetoria from './Trajetoria.astro';
+import TrabalhosSelecionados from './TrabalhosSelecionados.astro';
+import GaleriaEventos from './GaleriaEventos.astro';
+import Sobre from './Sobre.astro';
+import Contato from './Contato.astro';
+import Rodape from './Rodape.astro';
+import { temCases, temEventos } from '../data/conteudo';
+
+interface Props { idioma: Idioma }
+const { idioma } = Astro.props;
+
+/**
+ * Seções condicionais somem por completo quando não há material publicável,
+ * e a numeração editorial é recalculada sobre o que realmente aparece:
+ * sem isso, um "03" ausente pareceria uma seção faltando.
+ */
+let contador = 0;
+const n = () => String(++contador).padStart(2, '0');
+
+const numeros = {
+  atuacao: n(),
+  trajetoria: n(),
+  trabalhos: temCases ? n() : undefined,
+  registros: temEventos ? n() : undefined,
+  sobre: n(),
+  contato: n(),
+};
+---
+
+<Header idioma={idioma} />
+<main id="conteudo">
+  <Hero idioma={idioma} />
+  <Atuacao numero={numeros.atuacao} idioma={idioma} />
+  <Trajetoria numero={numeros.trajetoria} idioma={idioma} />
+  {temCases && <TrabalhosSelecionados numero={numeros.trabalhos} idioma={idioma} />}
+  {temEventos && <GaleriaEventos numero={numeros.registros} idioma={idioma} />}
+  <Sobre numero={numeros.sobre} idioma={idioma} />
+  <Contato numero={numeros.contato} idioma={idioma} />
+</main>
+<Rodape />

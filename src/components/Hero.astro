@@ -1,9 +1,18 @@
 ---
-import { hero } from '../data/textos';
-import { perfil, temCases } from '../data/conteudo';
+import { Picture } from 'astro:assets';
+import type { Idioma } from '../i18n';
+import { t } from '../i18n';
+import { perfil, obterRetrato, temCases } from '../data/conteudo';
 import MarcaEditorial from './MarcaEditorial.astro';
 
-const ctaPrincipal = temCases ? hero.ctaPrincipalComCases : hero.ctaPrincipal;
+interface Props { idioma: Idioma }
+const { idioma } = Astro.props;
+const d = t(idioma);
+const hero = d.hero;
+const retrato = obterRetrato(idioma);
+
+const ctaTexto = temCases ? hero.ctaPrincipalComCases : hero.ctaPrincipal;
+const ctaHref = temCases ? '#trabalhos' : '#trajetoria';
 ---
 
 <section class="hero" id="inicio">
@@ -23,22 +32,36 @@ const ctaPrincipal = temCases ? hero.ctaPrincipalComCases : hero.ctaPrincipal;
       <p class="hero__apoio">{hero.apoio}</p>
 
       <div class="hero__acoes">
-        <a class="botao botao--principal" href={ctaPrincipal.href}>
-          {ctaPrincipal.texto}
+        <a class="botao botao--principal" href={ctaHref}>
+          {ctaTexto}
           <span class="seta" aria-hidden="true">→</span>
         </a>
         <a class="botao botao--secundario" href={`mailto:${perfil.email}`}>
-          {hero.ctaSecundario.texto}
+          {hero.ctaSecundario}
         </a>
       </div>
     </div>
 
     <!--
-      Área visual. Enquanto não houver retrato, entra a composição abstrata do kit
-      (assets/decoracao/composicao-editorial.svg), decorativa e sem silhueta fictícia.
-      Para trocar pelo retrato: ver LEIA-ME.md, seção "Quando chegar o retrato".
+      Área visual. Com retrato cadastrado no manifesto, ele entra aqui; sem retrato,
+      a composição abstrata do kit segura o lugar — decorativa, sem silhueta fictícia.
     -->
     <div class="hero__visual">
+      {retrato ? (
+        <figure class="hero__retrato">
+          <Picture
+            src={retrato.src}
+            alt={retrato.alt}
+            widths={[320, 520, 800]}
+            sizes="(min-width: 62em) 25rem, (min-width: 48em) 50vw, 80vw"
+            loading="eager"
+            fetchpriority="high"
+            formats={['avif', 'webp']}
+            class="hero__foto"
+          />
+          {retrato.credito && <figcaption class="hero__credito">Foto: {retrato.credito}.</figcaption>}
+        </figure>
+      ) : (
       <svg
         class="hero__composicao"
         viewBox="0 0 600 720"
@@ -46,7 +69,7 @@ const ctaPrincipal = temCases ? hero.ctaPrincipalComCases : hero.ctaPrincipal;
         aria-hidden="true"
         focusable="false"
       >
-        <rect width="600" height="720" fill="#fefae0" />
+        <rect width="600" height="720" fill="var(--surface)" />
         <path d="M90 570V245a180 180 0 0 1 360 0v325Z" fill="#dda15e" />
         <circle cx="322" cy="320" r="144" fill="#606c38" />
         <path d="M165 575V370a114 114 0 0 1 228 0v205Z" fill="#283618" />
@@ -56,6 +79,7 @@ const ctaPrincipal = temCases ? hero.ctaPrincipalComCases : hero.ctaPrincipal;
           <path d="M287 385v72m-31-54 62 36m-62 0 62-36" />
         </g>
       </svg>
+      )}
     </div>
   </div>
 </section>
@@ -76,7 +100,7 @@ const ctaPrincipal = temCases ? hero.ctaPrincipalComCases : hero.ctaPrincipal;
     height: 2px;
     background: linear-gradient(
       to right,
-      var(--color-terracotta) 0 22%,
+      var(--accent) 0 22%,
       var(--rule) 22% 100%
     );
   }
@@ -98,25 +122,25 @@ const ctaPrincipal = temCases ? hero.ctaPrincipalComCases : hero.ctaPrincipal;
     font-weight: 700;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--color-olive);
+    color: var(--text-muted);
   }
   .hero__asterisco { width: 1.15em; height: 1.15em; }
-  .hero__nome { color: var(--color-forest); }
-  .hero__barra { color: var(--color-olive); }
+  .hero__nome { color: var(--text); }
+  .hero__barra { color: var(--text-muted); }
 
   .hero__titulo {
     /* Terracota em texto grande (>=48px) atende AA para texto grande sobre creme. */
     margin-block-end: var(--space-3);
   }
   .hero__linha { display: block; }
-  .hero__linha:last-child { color: var(--color-terracotta); }
+  .hero__linha:last-child { color: var(--accent); }
 
   .hero__apoio {
     max-width: 48ch;
     margin-block-end: var(--space-4);
     font-size: var(--step-lead);
     line-height: 1.55;
-    color: var(--color-olive);
+    color: var(--text-muted);
   }
 
   .hero__acoes {
@@ -139,12 +163,29 @@ const ctaPrincipal = temCases ? hero.ctaPrincipalComCases : hero.ctaPrincipal;
     border-radius: var(--radius);
   }
 
+  .hero__retrato { margin: 0; width: 100%; max-width: 22rem; }
+  .hero__retrato :global(picture) { display: block; }
+
+  .hero__foto {
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius);
+    /* Sem filtro: a foto mantém cor e textura naturais. */
+  }
+
+  .hero__credito {
+    margin-block-start: 0.6rem;
+    font-size: var(--step-small);
+    color: var(--text-muted);
+  }
+
   @media (min-width: 62em) {
     .hero__grade {
       /* Headline ocupa ~60% da largura, como na direção de arte. */
       grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
       gap: clamp(2.5rem, 5vw, 4.5rem);
     }
-    .hero__composicao { max-width: 25rem; }
+    .hero__composicao,
+    .hero__retrato { max-width: 25rem; }
   }
 </style>

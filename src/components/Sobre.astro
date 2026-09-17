@@ -1,23 +1,25 @@
 ---
-import { sobre } from '../data/textos';
-import { perfil } from '../data/conteudo';
+import type { Idioma } from '../i18n';
+import { t } from '../i18n';
+import { obterCompetencias, obterFerramentas, obterFormacao, obterIdiomas } from '../data/conteudo';
 import RotuloSecao from './RotuloSecao.astro';
 import MarcaEditorial from './MarcaEditorial.astro';
 
-interface Props { numero?: string }
-const { numero } = Astro.props;
+interface Props { numero?: string; idioma: Idioma }
+const { numero, idioma } = Astro.props;
+const sobre = t(idioma).sobre;
 
-const idiomas = perfil.languages.map((i) => `${i.language} ${i.level.toLowerCase()}`).join(' · ');
-
+const competencias = obterCompetencias(idioma);
+const ferramentas = obterFerramentas(idioma);
+const idiomas = obterIdiomas(idioma);
 /** Derivada de perfil.json para não divergir do currículo quando a formação mudar. */
-const { degree, institution, expectedEnd } = perfil.education;
-const formacao = `${degree} · ${institution} · conclusão prevista em ${expectedEnd.slice(0, 4)}.`;
+const formacao = obterFormacao(idioma, sobre.conclusaoPrevista);
 ---
 
 <section class="secao secao-sobre" id="sobre" aria-labelledby="titulo-sobre">
   <div class="container sobre__grade">
     <div class="sobre__principal">
-      <RotuloSecao numero={numero} texto="Sobre" />
+      <RotuloSecao numero={numero} texto={sobre.rotulo} />
       <h2 class="sobre__titulo" id="titulo-sobre">{sobre.titulo}</h2>
 
       <div class="sobre__texto">
@@ -26,10 +28,10 @@ const formacao = `${degree} · ${institution} · conclusão prevista em ${expect
 
       <p class="sobre__acoes">
         <!-- O PDF é copiado por scripts/sync-conteudo.mjs. Só o e-mail aparece na página; o telefone fica no PDF. -->
-        <a class="botao botao--secundario" href={sobre.curriculo.href} download>
-          {sobre.curriculo.texto}
-          <span class="sobre__formato" aria-hidden="true">{sobre.curriculo.complemento}</span>
-          <span class="visualmente-oculto">(arquivo {sobre.curriculo.complemento})</span>
+        <a class="botao botao--secundario" href="/curriculo/barbara-fraquete.pdf" download>
+          {sobre.curriculo}
+          <span class="sobre__formato" aria-hidden="true">{sobre.curriculoFormato}</span>
+          <span class="visualmente-oculto">({sobre.curriculoArquivo} {sobre.curriculoFormato})</span>
         </a>
       </p>
     </div>
@@ -38,7 +40,7 @@ const formacao = `${degree} · ${institution} · conclusão prevista em ${expect
       Quando chegar o retrato secundário, ele entra aqui (ver LEIA-ME.md).
       Até lá, a coluna é uma ficha tipográfica limpa, sem foto genérica.
     -->
-    <aside class="sobre__ficha" aria-label="Formação, ferramentas e idiomas">
+    <aside class="sobre__ficha" aria-label={sobre.fichaRotulo}>
       <MarcaEditorial class="sobre__marca" />
 
       <div class="sobre__campo">
@@ -47,15 +49,15 @@ const formacao = `${degree} · ${institution} · conclusão prevista em ${expect
       </div>
 
       <div class="sobre__campo">
-        <h3 class="sobre__rotulo">Competências</h3>
+        <h3 class="sobre__rotulo">{sobre.rotulos.competencias}</h3>
         <ul class="sobre__tags">
-          {perfil.skills.map((competencia) => <li class="sobre__tag">{competencia}</li>)}
+          {competencias.map((competencia) => <li class="sobre__tag">{competencia}</li>)}
         </ul>
       </div>
 
       <div class="sobre__campo">
         <h3 class="sobre__rotulo">{sobre.rotulos.ferramentas}</h3>
-        <p class="sobre__valor">{perfil.tools.join(' · ')}</p>
+        <p class="sobre__valor">{ferramentas.join(' · ')}</p>
       </div>
 
       {idiomas && (
@@ -86,7 +88,7 @@ const formacao = `${degree} · ${institution} · conclusão prevista em ${expect
     max-width: var(--measure);
     font-size: var(--step-lead);
     line-height: 1.6;
-    color: var(--color-olive);
+    color: var(--text-muted);
   }
 
   .sobre__acoes { margin-block-start: var(--space-4); }
@@ -100,15 +102,16 @@ const formacao = `${degree} · ${institution} · conclusão prevista em ${expect
     background-color: var(--color-sand);
     border-radius: var(--radius-sm);
   }
-  .botao--secundario:hover .sobre__formato { background-color: var(--color-cream); }
+  /* No tema escuro o botão fica creme ao passar o mouse; um selo creme sumiria
+     dentro dele. A areia mantém o selo legível nos dois temas. */
 
   .sobre__ficha {
     position: relative;
     display: grid;
     gap: var(--space-3);
     padding: clamp(1.5rem, 3vw, 2rem);
-    background-color: var(--color-forest);
-    color: var(--color-cream);
+    background-color: var(--surface-invert);
+    color: var(--on-invert-text);
     border-radius: var(--radius);
   }
 
@@ -118,7 +121,7 @@ const formacao = `${degree} · ${institution} · conclusão prevista em ${expect
     right: 1.25rem;
     width: 1.8rem;
     height: 1.8rem;
-    color: var(--color-terracotta);
+    color: var(--color-sand);
   }
 
   .sobre__rotulo {
@@ -127,20 +130,19 @@ const formacao = `${degree} · ${institution} · conclusão prevista em ${expect
     font-weight: 700;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    /* Areia sobre floresta: 5,72:1. */
-    color: var(--color-sand);
+    color: var(--on-invert-muted);
   }
 
   .sobre__valor {
     margin-block-start: 0.4rem;
     font-size: var(--step-small);
     line-height: 1.55;
-    color: var(--color-cream);
+    color: var(--on-invert-text);
   }
 
   .sobre__campo + .sobre__campo {
     padding-block-start: var(--space-3);
-    border-block-start: 1px solid color-mix(in srgb, var(--color-sand) 35%, transparent);
+    border-block-start: 1px solid var(--rule-invert);
   }
 
   .sobre__tags {
@@ -156,7 +158,7 @@ const formacao = `${degree} · ${institution} · conclusão prevista em ${expect
     padding: 0.3rem 0.7rem;
     font-size: 0.8125rem;
     line-height: 1.3;
-    color: var(--color-cream);
+    color: var(--on-invert-text);
     border: 1px solid color-mix(in srgb, var(--color-sand) 55%, transparent);
     border-radius: 999px;
   }

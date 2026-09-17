@@ -19,9 +19,9 @@ import MarcaEditorial from './MarcaEditorial.astro';
 <style>
   .rodape {
     padding-block: var(--space-4);
-    color: var(--color-cream);
-    background-color: var(--color-forest);
-    border-block-start: 1px solid color-mix(in srgb, var(--color-sand) 30%, transparent);
+    color: var(--on-invert-text);
+    background-color: var(--surface-invert);
+    border-block-start: 1px solid var(--rule-invert);
   }
 
   .rodape__interno {
@@ -42,7 +42,7 @@ import MarcaEditorial from './MarcaEditorial.astro';
     letter-spacing: 0.02em;
   }
 
-  .rodape__marca { width: 0.85em; height: 0.85em; color: var(--color-sand); }
+  .rodape__marca { width: 0.85em; height: 0.85em; color: var(--on-invert-muted); }
 
-  .rodape__contato { color: var(--color-sand); }
+  .rodape__contato { color: var(--on-invert-muted); }
 </style>

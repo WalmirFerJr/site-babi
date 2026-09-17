@@ -1,0 +1,181 @@
+---
+import { Picture } from 'astro:assets';
+import type { Idioma } from '../i18n';
+import { t, rota } from '../i18n';
+import type { CasePublicado } from '../data/conteudo';
+import Header from './Header.astro';
+import Contato from './Contato.astro';
+import Rodape from './Rodape.astro';
+
+interface Props { caso: CasePublicado; idioma: Idioma }
+const { caso, idioma } = Astro.props;
+const d = t(idioma);
+
+const blocos = [
+  { titulo: d.trabalhos.blocos.contexto, texto: caso.context },
+  { titulo: d.trabalhos.blocos.objetivo, texto: caso.objective },
+  { titulo: d.trabalhos.blocos.papel, texto: caso.role },
+].filter((bloco): bloco is { titulo: string; texto: string } => Boolean(bloco.texto));
+
+const listas = [
+  { titulo: d.trabalhos.listas.processo, itens: caso.process },
+  { titulo: d.trabalhos.listas.entregas, itens: caso.deliverables },
+  { titulo: d.trabalhos.listas.resultados, itens: caso.results },
+].filter((lista) => lista.itens.length > 0);
+---
+
+
+<Header idioma={idioma} />
+  <main id="conteudo">
+    <article class="caso">
+      <header class="secao caso__abertura">
+        <div class="container">
+          <p class="caso__migalha">
+            <a class="link" href={rota(idioma, "/#trabalhos")}>{d.trabalhos.voltar}</a>
+          </p>
+          <p class="caso__empresa">{caso.company}</p>
+          <h1 class="caso__titulo">{caso.title}</h1>
+          {caso.period && <p class="caso__periodo">{caso.period}</p>}
+        </div>
+      </header>
+
+      {caso.imagens[0] && (
+        <div class="container caso__capa">
+          <figure>
+            <Picture
+              src={caso.imagens[0].src}
+              alt={caso.imagens[0].alt}
+              widths={[600, 1000, 1600]}
+              sizes="(min-width: 75em) 72rem, 92vw"
+              loading="eager"
+              fetchpriority="high"
+              formats={['avif', 'webp']}
+              class="caso__imagem"
+            />
+            {caso.imagens[0].legenda && <figcaption class="caso__legenda">{caso.imagens[0].legenda}</figcaption>}
+          </figure>
+        </div>
+      )}
+
+      <div class="secao">
+        <div class="container caso__grade">
+          <div class="caso__texto">
+            {blocos.map((bloco) => (
+              <section class="caso__bloco">
+                <h2 class="caso__subtitulo">{bloco.titulo}</h2>
+                <p>{bloco.texto}</p>
+              </section>
+            ))}
+
+            {listas.map((lista) => (
+              <section class="caso__bloco">
+                <h2 class="caso__subtitulo">{lista.titulo}</h2>
+                <ul class="caso__lista" data-marcadores>
+                  {lista.itens.map((item) => <li>{item}</li>)}
+                </ul>
+              </section>
+            ))}
+          </div>
+
+          {caso.credits.length > 0 && (
+            <aside class="caso__creditos" aria-label={d.trabalhos.creditos}>
+              <h2 class="caso__subtitulo">{d.trabalhos.creditos}</h2>
+              <ul class="caso__lista" data-marcadores>
+                {caso.credits.map((credito) => <li>{credito}</li>)}
+              </ul>
+            </aside>
+          )}
+        </div>
+      </div>
+
+      {caso.imagens.length > 1 && (
+        <div class="container caso__galeria">
+          {caso.imagens.slice(1).map((imagem) => (
+            <figure>
+              <Picture
+                src={imagem.src}
+                alt={imagem.alt}
+                widths={[500, 900]}
+                sizes="(min-width: 62em) 34rem, 92vw"
+                loading="lazy"
+                decoding="async"
+                formats={['avif', 'webp']}
+                class="caso__imagem"
+              />
+              {imagem.legenda && <figcaption class="caso__legenda">{imagem.legenda}</figcaption>}
+            </figure>
+          ))}
+        </div>
+      )}
+    </article>
+
+    <Contato idioma={idioma} />
+  </main>
+  <Rodape />
+
+<style>
+  .caso__abertura { padding-block-end: clamp(1.5rem, 3vw, 2.5rem); }
+
+  .caso__migalha { margin-block-end: var(--space-3); font-size: var(--step-small); }
+
+  .caso__empresa {
+    font-family: var(--font-display);
+    font-size: var(--step-label);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .caso__titulo { margin-block-start: var(--space-2); max-width: 16ch; }
+
+  .caso__periodo {
+    margin-block-start: var(--space-2);
+    font-size: var(--step-small);
+    color: var(--text-muted);
+  }
+
+  .caso figure :global(picture) { display: block; }
+
+  .caso__imagem { width: 100%; height: auto; border-radius: var(--radius); }
+
+  .caso__legenda {
+    margin-block-start: 0.75rem;
+    max-width: 46ch;
+    font-size: var(--step-small);
+    color: var(--text-muted);
+  }
+
+  .caso__grade { display: grid; gap: clamp(2rem, 4vw, 3.5rem); align-items: start; }
+
+  .caso__texto { display: grid; gap: clamp(1.75rem, 3vw, 2.5rem); }
+
+  .caso__bloco { max-width: var(--measure); }
+
+  .caso__subtitulo {
+    margin-block-end: 0.6rem;
+    font-size: var(--step-h3);
+  }
+
+  .caso__bloco p, .caso__lista { color: var(--text-muted); line-height: 1.6; }
+
+  .caso__lista { display: grid; gap: 0.5rem; padding-inline-start: 1.1rem; }
+  .caso__lista li::marker { color: var(--accent); }
+
+  .caso__creditos {
+    padding: var(--space-3);
+    background-color: var(--surface-alt);
+    border-radius: var(--radius);
+  }
+
+  .caso__galeria {
+    display: grid;
+    gap: clamp(1.5rem, 3vw, 2.5rem);
+    padding-block-end: clamp(3rem, 6vw, 5rem);
+  }
+
+  @media (min-width: 62em) {
+    .caso__grade { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); }
+    .caso__galeria { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+  }
+</style>

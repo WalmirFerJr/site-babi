@@ -41,7 +41,19 @@ test('imagem com publicUse falso nunca é publicada', async () => {
   assert.ok(privadas.length > 0, 'o manifesto precisa ter ao menos uma imagem privada para este teste valer');
 
   for (const asset of privadas) {
+    // O arquivo não pode ter entrado no projeto, sob nenhum nome.
+    const noProjeto = (await arquivos(path.join(siteDir, 'src/assets'))).filter((f) =>
+      path.basename(f).startsWith(asset.id),
+    );
+    assert.deepEqual(noProjeto, [], `${asset.id} não deveria estar em src/assets/`);
+    assert.ok(!htmlJunto.includes(asset.id), `${asset.id} é referenciado no HTML publicado`);
+
+    // Com o kit por perto, a verificação é mais forte: comparação byte a byte,
+    // que pega o arquivo mesmo renomeado ou reprocessado. Sem o kit (clone só do
+    // site, build na Vercel), ficam valendo as duas checagens acima.
     const origem = path.join(kit, asset.path);
+    if (!existsSync(origem)) continue;
+
     const conteudo = await readFile(origem);
     for (const arquivo of todosOsArquivos) {
       const info = await stat(arquivo);
@@ -49,10 +61,6 @@ test('imagem com publicUse falso nunca é publicada', async () => {
       const publicado = await readFile(arquivo);
       assert.ok(!publicado.equals(conteudo), `${asset.id} vazou para ${path.relative(dist, arquivo)}`);
     }
-    assert.ok(
-      !existsSync(path.join(siteDir, 'src/assets/eventos', `${asset.id}.jpeg`)),
-      `${asset.id} não deveria estar em src/assets/eventos/`,
-    );
   }
 });
 

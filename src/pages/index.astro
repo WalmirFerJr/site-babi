@@ -1,0 +1,44 @@
+---
+import Base from '../layouts/Base.astro';
+import Header from '../components/Header.astro';
+import Hero from '../components/Hero.astro';
+import Atuacao from '../components/Atuacao.astro';
+import Trajetoria from '../components/Trajetoria.astro';
+import TrabalhosSelecionados from '../components/TrabalhosSelecionados.astro';
+import GaleriaEventos from '../components/GaleriaEventos.astro';
+import Sobre from '../components/Sobre.astro';
+import Contato from '../components/Contato.astro';
+import Rodape from '../components/Rodape.astro';
+import { temCases, temEventos } from '../data/conteudo';
+
+/**
+ * Seções condicionais somem por completo quando não há material publicável,
+ * e a numeração editorial é recalculada sobre o que realmente aparece:
+ * sem isso, um "03" ausente pareceria uma seção faltando.
+ */
+let contador = 0;
+const n = () => String(++contador).padStart(2, '0');
+
+const numeros = {
+  atuacao: n(),
+  trajetoria: n(),
+  trabalhos: temCases ? n() : undefined,
+  registros: temEventos ? n() : undefined,
+  sobre: n(),
+  contato: n(),
+};
+---
+
+<Base>
+  <Header />
+  <main id="conteudo">
+    <Hero />
+    <Atuacao numero={numeros.atuacao} />
+    <Trajetoria numero={numeros.trajetoria} />
+    {temCases && <TrabalhosSelecionados numero={numeros.trabalhos} />}
+    {temEventos && <GaleriaEventos numero={numeros.registros} />}
+    <Sobre numero={numeros.sobre} />
+    <Contato numero={numeros.contato} />
+  </main>
+  <Rodape />
+</Base>

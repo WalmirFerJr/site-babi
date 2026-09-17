@@ -1,0 +1,41 @@
+---
+import Base from '../layouts/Base.astro';
+import Header from '../components/Header.astro';
+import Rodape from '../components/Rodape.astro';
+import MarcaEditorial from '../components/MarcaEditorial.astro';
+import { perfil } from '../data/conteudo';
+---
+
+<Base titulo={`Página não encontrada | ${perfil.name}`} descricao="A página procurada não existe neste site.">
+  <Header />
+  <main id="conteudo" class="secao erro">
+    <div class="container erro__interno">
+      <MarcaEditorial class="erro__marca" />
+      <p class="erro__codigo">404</p>
+      <h1 class="erro__titulo">Essa página saiu do calendário.</h1>
+      <p class="erro__texto">O endereço não existe ou mudou de lugar. Volte para o início e siga a partir de lá.</p>
+      <p>
+        <a class="botao botao--principal" href="/">
+          Voltar ao início
+          <span class="seta" aria-hidden="true">→</span>
+        </a>
+      </p>
+    </div>
+  </main>
+  <Rodape />
+</Base>
+
+<style>
+  .erro { display: grid; align-content: center; min-height: 60vh; }
+  .erro__interno { display: grid; gap: var(--space-3); justify-items: start; }
+  .erro__marca { width: 2.5rem; height: 2.5rem; }
+  .erro__codigo {
+    font-family: var(--font-display);
+    font-size: var(--step-label);
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    color: var(--color-olive);
+  }
+  .erro__titulo { max-width: 14ch; }
+  .erro__texto { max-width: var(--measure); font-size: var(--step-lead); color: var(--color-olive); }
+</style>

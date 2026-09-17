@@ -19,6 +19,20 @@
       "credit": "Elemento original criado para este kit"
     },
     {
+      "id": "retrato-principal",
+      "path": "assets/fotos/barbara-retrato-01.jpeg",
+      "type": "portrait",
+      "status": "received",
+      "sha256": "de097d583ceef63a67399c10b9b68405c65ee6d91b15a823e277f569d506d5e9",
+      "alt": "Retrato de Bárbara Fraquete.",
+      "caption": null,
+      "credit": null,
+      "width": 800,
+      "height": 800,
+      "publicUse": true,
+      "note": "Retrato enviado pelo usuário. Quadrado, 800 px no lado maior — abaixo dos 1600 px sugeridos no kit; exibido a cerca de 400 px, o que dá densidade 2x. Se houver um original maior, substituir para ganhar nitidez em telas grandes."
+    },
+    {
       "id": "evento-1781136192015",
       "path": "assets/eventos/Projeto Scwepss/1781136192015.jpeg",
       "type": "event-photo",
@@ -150,8 +164,9 @@
       "id": "portrait-main",
       "folder": "assets/fotos",
       "type": "portrait",
-      "status": "pending",
-      "path": null
+      "status": "received",
+      "path": "assets/fotos/barbara-retrato-01.jpeg",
+      "assetId": "retrato-principal"
     },
     {
       "id": "logo-digipix",

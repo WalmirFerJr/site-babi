@@ -98,6 +98,10 @@ export const eventos: Record<string, { titulo: string; tipo: string; dataLabel?:
 };
 
 export const legendas: Record<string, { alt: string; caption: string }> = {
+  'retrato-principal': {
+    alt: 'Portrait of Bárbara Fraquete.',
+    caption: '',
+  },
   'evento-1782411664005': {
     alt: 'Audience facing a stage and green panels at the Influent Summit.',
     caption: 'Record of attendance at the Influent Summit 2026.',

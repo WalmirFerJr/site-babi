@@ -74,7 +74,7 @@ export function imagem(id: string, idioma: Idioma = 'pt'): Imagem | null {
     id: asset.id,
     src: arquivos[chave]!.default,
     alt,
-    legenda: traducao ? traducao.caption : legendaPublica(asset.caption),
+    legenda: traducao ? traducao.caption.trim() || null : legendaPublica(asset.caption),
     credito: asset.credit?.trim() || null,
   };
 }

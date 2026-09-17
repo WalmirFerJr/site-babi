@@ -46,7 +46,7 @@ const ctaHref = temCases ? '#trabalhos' : '#trajetoria';
       Área visual. Com retrato cadastrado no manifesto, ele entra aqui; sem retrato,
       a composição abstrata do kit segura o lugar — decorativa, sem silhueta fictícia.
     -->
-    <div class="hero__visual">
+    <div class="hero__visual" data-tipo={retrato ? 'retrato' : 'composicao'}>
       {retrato ? (
         <figure class="hero__retrato">
           <Picture
@@ -150,11 +150,11 @@ const ctaHref = temCases ? '#trabalhos' : '#trajetoria';
   }
 
   .hero__visual {
-    /* Bastante respiro: a composição não encosta nas bordas do bloco. */
     display: grid;
     place-items: center;
-    padding: clamp(0.5rem, 3vw, 2rem);
   }
+  /* A composição abstrata pede respiro; o retrato pode ocupar o bloco. */
+  .hero__visual[data-tipo='composicao'] { padding: clamp(0.5rem, 3vw, 2rem); }
 
   .hero__composicao {
     width: 100%;
@@ -163,8 +163,26 @@ const ctaHref = temCases ? '#trabalhos' : '#trajetoria';
     border-radius: var(--radius);
   }
 
-  .hero__retrato { margin: 0; width: 100%; max-width: 22rem; }
-  .hero__retrato :global(picture) { display: block; }
+  .hero__retrato {
+    position: relative;
+    margin: 0;
+    width: 100%;
+    max-width: 24rem;
+  }
+  .hero__retrato :global(picture) { display: block; position: relative; z-index: 1; }
+
+  /* Bloco de cor deslocado atrás da foto: mesmo gesto da composição do kit,
+     sem tocar na imagem em si. */
+  .hero__retrato::before {
+    content: '';
+    position: absolute;
+    /* O deslocamento encolhe em telas estreitas para o bloco não encostar na
+       borda da tela — o hero tem overflow hidden, então ficaria cortado. */
+    --desloc: clamp(0.75rem, 3vw, 1.75rem);
+    inset: var(--desloc) calc(var(--desloc) * -1) calc(var(--desloc) * -1) var(--desloc);
+    background-color: var(--color-sand);
+    border-radius: var(--radius);
+  }
 
   .hero__foto {
     width: 100%;
@@ -185,7 +203,7 @@ const ctaHref = temCases ? '#trabalhos' : '#trajetoria';
       grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
       gap: clamp(2.5rem, 5vw, 4.5rem);
     }
-    .hero__composicao,
-    .hero__retrato { max-width: 25rem; }
+    .hero__composicao { max-width: 25rem; }
+    .hero__retrato { max-width: 26rem; }
   }
 </style>
